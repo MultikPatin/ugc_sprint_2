@@ -1,0 +1,68 @@
+openapi: 3.0.3
+info:
+  title: UGC Events API
+  description: API для обработки пользовательских событий сервиса фильмов.
+  version: 1.0.0
+servers:
+  - url: '/api/v1'
+tags:
+  - name: events
+    description: "Event data for analysis users actions"
+paths:
+  /events:
+    post:
+      tags:
+        - events
+      parameters:
+        - in: query
+          name: key
+          schema:
+            type: string
+            default: test_event
+      requestBody:
+        description: Create a new user event
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Event'
+
+      responses:
+        '202':
+          description: Successful operation
+        '400':
+          description: Invalid request, missing required parameters
+
+components:
+  securitySchemes:
+    cookieAuth: # arbitrary name for the security scheme; will be used in the "security" key later
+      type: apiKey
+      in: cookie
+      name: access_token
+      description: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJiZjA1MTE5Ny0wODFjLTQyYWUtOWVmMy01NjZmNDlkNThhNzMiLCJyb2xlcyI6InN1YnNjcmliZXIiLCJleHAiOjE3NDg0MTQ0NzJ9.UmjE_eqTeqwz0KmlrIQw1HtjymuIQR4vpVNO2G5Z3hI"
+  schemas:
+    Event:
+      required:
+        - entity_type
+        - entity
+        - action
+      type: object
+      properties:
+        service:
+          type: string
+          example: Movies
+        timestamp:
+          type: string
+          format: date-time
+          example: 2024-05-13 14:00:00
+        entity_type:
+          type: string
+          example: Фильм
+        entity:
+          type: string
+          example: Иван Васильевич меняет профессию
+        action:
+          type: string
+          example: Начало просмотра
+
+security:
+  - cookieAuth: []
