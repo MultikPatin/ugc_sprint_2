@@ -1,27 +1,43 @@
-FROM python:3.11-slim
+FROM python:3.11-slim as requirements-stage
 
-ENV SRC_PATH='/app' \
-    APP_DIR='src/etl_analytics' \
+WORKDIR /tmp
+
+ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1
+    \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    PIP_DEFAULT_TIMEOUT=100 \
+    \
+    POETRY_HOME="/opt/poetry" \
+    POETRY_VIRTUALENVS_CREATE=false \
+    POETRY_VIRTUALENVS_IN_PROJECT=false \
+    POETRY_NO_INTERACTION=1 \
+    POETRY_VERSION=1.7.1
 
-WORKDIR $SRC_PATH
+RUN pip install --upgrade pip && \
+    pip install "poetry==$POETRY_VERSION"
+
+COPY ./pyproject.toml ./poetry.lock* /tmp/
+
+RUN poetry export -f requirements.txt --output requirements.txt --without-hashes
 
 
-COPY poetry.lock pyproject.toml ./
+FROM python:3.11-slim-buster
 
-RUN python -m pip install --no-cache-dir poetry==1.7.1 \
-    && poetry config virtualenvs.create false \
-    && poetry install --extras etl_analytics --no-interaction --no-ansi \
-    && rm -rf $(poetry config cache-dir)/{cache,artifacts}
+WORKDIR /opt/etl_analytics
 
-COPY ./${APP_DIR} ./${APP_DIR}
-COPY ./src/core/__init__.py ./src/core/__init__.py
-COPY ./src/core/configs/__init__.py ./src/core/configs/__init__.py
-COPY ./src/core/utils/__init__.py ./src/core/utils/__init__.py
-COPY ./src/core/utils/logger.py ./src/core/utils/logger.py
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends netcat && \
+    apt-get install -y --no-install-recommends gettext
 
-RUN sed -i 's/\r$//g' ${APP_DIR}/entrypoint.sh && \
-    chmod +x ${APP_DIR}/entrypoint.sh
+COPY --from=requirements-stage /tmp/requirements.txt ./requirements.txt
 
-ENTRYPOINT ["/bin/bash", "-c", "exec ${SRC_PATH}/${APP_DIR}/entrypoint.sh"]
+RUN pip install --no-cache-dir --upgrade -r ./requirements.txt
+
+COPY . .
+
+RUN sed -i 's/\r$//g'  ./entrypoint.sh && \
+    chmod +x  ./entrypoint.sh
+
+ENTRYPOINT ["sh", "entrypoint.sh"]

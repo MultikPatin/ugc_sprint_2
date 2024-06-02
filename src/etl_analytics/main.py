@@ -1,10 +1,10 @@
 import logging
 import time
 
-from src.ugs.core.utils.logger import create_logger
-from src.etl_analytics.config import settings
-from src.etl_analytics.helpers.extractor import KafkaExtractor
-from src.etl_analytics.helpers.loader import ClickHouseLoader
+from utils.logger import create_logger
+from config import settings
+from helpers.extractor import KafkaExtractor
+from helpers.loader import ClickHouseLoader
 
 
 def etl(
@@ -20,7 +20,7 @@ def etl(
             messages.append(message)
             if (
                 len(messages) >= settings.kafka.batch_size
-                or (time.time() - last_received_time) >= settings.sleep_time
+                or (time.time() - last_received_time) >= settings.app.sleep_time
             ):
                 loader.write_data(messages)
                 extractor.commit()
