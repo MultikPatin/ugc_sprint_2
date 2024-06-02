@@ -5,8 +5,8 @@ import backoff
 from kafka import KafkaConsumer
 from kafka import errors as kafka_errors
 
-from config import KafkaSettings
-from models.events import EventMessage
+from src.config import KafkaSettings
+from src.models.events import EventMessage
 
 
 class KafkaExtractor:

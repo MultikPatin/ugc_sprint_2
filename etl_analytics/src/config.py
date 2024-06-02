@@ -18,7 +18,7 @@ class EnvSettings(BaseSettings):
 class KafkaSettings(EnvSettings):
     host: str = Field(..., alias="KAFKA_HOST")
     port: int = Field(..., alias="KAFKA_PORT")
-    topic: str = Field(..., alias="KAFKA_TOPIC_NAME_1")
+    topic: str = Field(..., alias="KAFKA_TOPIC")
     batch_size: int = Field(..., alias="BATCH_SIZE")
     consumer_timeout: int = Field(..., alias="CONSUMER_TIMEOUT")
     auto_offset_reset: str = "earliest"

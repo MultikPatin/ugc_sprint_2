@@ -1,10 +1,10 @@
 import logging
 import time
 
-from utils.logger import create_logger
-from config import settings
-from helpers.extractor import KafkaExtractor
-from helpers.loader import ClickHouseLoader
+from src.utils.logger import create_logger
+from src.config import settings
+from src.helpers.extractor import KafkaExtractor
+from src.helpers.loader import ClickHouseLoader
 
 
 def etl(

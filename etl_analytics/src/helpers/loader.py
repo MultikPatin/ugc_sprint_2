@@ -3,8 +3,8 @@ import backoff
 from clickhouse_driver import Client
 from clickhouse_driver import errors as ch_errors
 
-from config import ClickHouseSettings
-from models.events import EventMessage
+from src.config import ClickHouseSettings
+from src.models.events import EventMessage
 
 
 class ClickHouseLoader:
