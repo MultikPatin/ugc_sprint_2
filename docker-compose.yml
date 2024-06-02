@@ -20,8 +20,8 @@ services:
     networks:
       - kafka_network
 
-  etl_analytics:
-    container_name: etl_analytics
+  etl_analytics_events:
+    container_name: etl_analytics_events
     image: etl_analytics:latest
     build:
       context: ./etl_analytics/
