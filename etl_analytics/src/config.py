@@ -32,12 +32,17 @@ class ClickHouseSettings(EnvSettings):
     password: str = Field(..., alias="CLICKHOUSE_PASSWORD")
 
 
+class SentrySettings(EnvSettings):
+    dsn: str = Field(..., alias="SENTRY_DSN")
+
+
 class AppSettings(EnvSettings):
     sleep_time: int = Field(..., alias="SLEEP_TIME")
 
 
 class Settings(BaseSettings):
     app: AppSettings = AppSettings()
+    sentry: SentrySettings = SentrySettings()
     kafka: KafkaSettings = KafkaSettings()
     clickHouse: ClickHouseSettings = ClickHouseSettings()
 
