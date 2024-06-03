@@ -10,8 +10,8 @@ services:
       - KAFKA_HOST=${KAFKA_BROKER_NAME_0}
       - KAFKA_PORT=${KAFKA_INTERNAL_PORT}
     build:
-      context: ./
-      dockerfile: src/ugs/Dockerfile
+      context: ./ugc/
+      dockerfile: Dockerfile
     ports:
       - "5000:5000"
     depends_on:
