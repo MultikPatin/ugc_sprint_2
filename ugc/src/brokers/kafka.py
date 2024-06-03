@@ -1,8 +1,8 @@
 from kafka import KafkaProducer
 
-from src.ugs.brokers.base import BaseBrokerProducer
-from src.ugs.core.config import settings
-from src.ugs.models.events import EventModel
+from src.brokers.base import BaseBrokerProducer
+from src.core.config import settings
+from src.models.events import EventModel
 
 
 class KafkaBrokerProducer(BaseBrokerProducer):
@@ -21,6 +21,4 @@ class KafkaBrokerProducer(BaseBrokerProducer):
 
 
 def get_kafka_producer() -> BaseBrokerProducer:
-    return KafkaBrokerProducer(
-        producer=KafkaProducer(bootstrap_servers=[settings.kafka.bootstrap_servers])
-    )
+    return KafkaBrokerProducer(producer=KafkaProducer(bootstrap_servers=[settings.kafka.bootstrap_servers]))

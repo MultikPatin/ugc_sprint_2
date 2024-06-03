@@ -1,6 +1,6 @@
-from src.ugs.brokers.base import BaseBrokerProducer
-from src.ugs.brokers.kafka import get_kafka_producer
-from src.ugs.models.events import EventModel
+from src.brokers.base import BaseBrokerProducer
+from src.brokers.kafka import get_kafka_producer
+from src.models.events import EventModel
 
 
 class EventHandler:

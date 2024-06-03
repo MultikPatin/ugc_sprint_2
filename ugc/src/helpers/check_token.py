@@ -8,7 +8,7 @@ from flask import abort, request
 from jwt import DecodeError
 from pydantic import ValidationError
 
-from src.ugs.models.auth import AuthUser
+from src.models.auth import AuthUser
 
 
 def get_data_jwt(encode_jwt: str) -> dict[str, Any] | None:

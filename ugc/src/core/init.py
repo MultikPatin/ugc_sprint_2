@@ -1,11 +1,9 @@
+import logging
 from typing import Any
 
 from kafka.admin import KafkaAdminClient, NewTopic
 
-from src.ugs.core.config import settings
-from src.ugs.core.utils.logger import create_logger
-
-logger = create_logger("ugc")
+from .config import settings
 
 TOPIC_LIST: list[str] = ["events"]
 
@@ -36,17 +34,15 @@ class KafkaInit:
         for topic_name in TOPIC_LIST:
             try:
                 self.append_topic(name=topic_name, config=topic_config)
-                logger.info(f"Topic {topic_name} appended")
+                logging.info(f"Topic {topic_name} appended")
             except Exception:
-                logger.error(f"Topic {topic_name} didn't append")
+                logging.error(f"Topic {topic_name} didn't append")
 
         try:
-            self.admin_client.create_topics(
-                new_topics=self.topics_list, validate_only=False
-            )
-            logger.info("All topics created")
+            self.admin_client.create_topics(new_topics=self.topics_list, validate_only=False)
+            logging.info("All topics created")
         except NotImplementedError:
-            logger.error("Topics didn't create")
+            logging.error("Topics didn't create")
 
 
 def get_kafka_init() -> KafkaInit:

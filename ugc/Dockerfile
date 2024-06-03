@@ -18,9 +18,9 @@ ENV PYTHONUNBUFFERED=1 \
 RUN pip install --upgrade pip && \
     pip install "poetry==$POETRY_VERSION"
 
-COPY ../../pyproject.toml ./poetry.lock* /tmp/
+COPY ./pyproject.toml ./poetry.lock* /tmp/
 
-RUN poetry export -f requirements.txt --output requirements.txt --without-hashes --extras ugc
+RUN poetry export -f requirements.txt --output requirements.txt --without-hashes
 
 
 FROM python:3.11-slim-buster
@@ -35,7 +35,7 @@ COPY --from=requirements-stage /tmp/requirements.txt ./requirements.txt
 
 RUN pip install --no-cache-dir --upgrade -r ./requirements.txt
 
-COPY ../.. .
+COPY . .
 
 RUN sed -i 's/\r$//g'  ./entrypoint.sh && \
     chmod +x  ./entrypoint.sh
