@@ -9,7 +9,7 @@ skinparam wrapWidth 300
 
 hide footbox
 
-title Movies UGC Sequence (v2)
+title Event UGC Sequence (v2)
 header %date("dd MMMM YYYY")
 
 actor Client
@@ -46,7 +46,7 @@ end note
 
 Api --> Client: 202 ACCEPTED
 
-newpage Movies UGC Sequence (v2)
+newpage Grades UGC Sequence (v2)
 header %date("dd MMMM YYYY")
 
 == CREATE ==
@@ -61,21 +61,24 @@ end note
 Api -> Model: new GradeModel(data: dict)
 note over Model
 GradeModel:
-    id: uuid
     user_id: uuid
-    timestamp: datetime
     film_id: uuid
-    rating: smallint
+    rating: smallint <<0 - 10, default: 0>>
+    timestamp: datetime
 end note
-Model -> Store: save to <<grades>>
+
+Model -> Store: save(grade: GradeModel)
+note over Store
+table <<grades>>
+end note
 
 Api -> EventHandler: new EventHandler(topic: str, key: str, data: dict)
 note over EventHandler
 GradeEventHandler:
     user_id: uuid
-    timestamp: datetime
     film_id: uuid
     rating: smallint
+    timestamp: datetime
 end note
 
 EventHandler -> Kafka: producer.send(topic: str, value: bytes, key: bytes)
@@ -83,7 +86,13 @@ note over Kafka
 topic: <<grades>>
 end note
 
-Api --> Client: 202 ACCEPTED
+Api --> Client: 201 CREATED
+
+== READ ==
+Client -> Api: GET http://127.0.0.1:8000/grades/{film_id:uuid} \n-h Cookies: access_token=jwt_token
+Api -> Model: get_grade_by(film_id: uuid)
+Model -> Store: fetch(film_id: uuid)
+Api --> Client: 200 OK -d {data: json} <<GradeModel>>
 
 == UPDATE ==
 Client -> Api: PATCH http://127.0.0.1:8000/grades/{film_id:uuid} \n-d {data: dict}\n-h Cookies: access_token=jwt_token
@@ -92,7 +101,8 @@ note over Api
   rating: smallint
 }
 end note
-Api -> Store: update_grade_by(film_id: uuid)
+Api -> Model: get_grade_by(film_id: uuid)
+Model -> Store: update(rating: smallint)
 
 Api -> EventHandler: new EventHandler(topic: str, key: str, data: dict)
 note over EventHandler
@@ -110,14 +120,10 @@ end note
 
 Api --> Client: 200 OK -d {data: json} <<GradeModel>>
 
-== GET ==
-Client -> Api: GET http://127.0.0.1:8000/grades/{film_id:uuid} \n-h Cookies: access_token=jwt_token
-Api -> Store: get_grade_by(film_id: uuid)
-Api --> Client: 200 OK -d {data: json} <<GradeModel>>
-
 == DELETE ==
 Client -> Api: DELETE http://127.0.0.1:8000/grades/{film_id:uuid} \n-h Cookies: access_token=jwt_token
-Api -> Store: delete_grade_by(film_id: uuid)
+Api -> Model: get_grade_by(film_id: uuid, user_id: uuid)
+Model -> Store: delete()
 Api -> EventHandler: new EventHandler(topic: str, key: str, data: dict)
 note over EventHandler
 GradeEventHandler:
@@ -132,5 +138,115 @@ note over Kafka
 topic: <<grades>>
 end note
 Api --> Client: 204 NO CONTENT
+
+newpage Reviews UGC Sequence (v2)
+header %date("dd MMMM YYYY")
+
+== CREATE ==
+Client -> Api: POST http://127.0.0.1:8000/reviews \n-d {data: dict}\n-h Cookies: access_token=jwt_token
+note over Api
+{
+  film_id: uuid
+  text: str
+}
+end note
+
+Api -> Model: new ReviewModel(data: dict)
+note over Model
+ReviewModel:
+    id: uuid
+    film_id: uuid
+    author: uuid
+    text: str
+    rating: smallint <<0 - 10, default: 0>>
+    timestamp: datetime
+end note
+
+Model -> Store: save(review: ReviewModel)
+note over Store
+table <<reviews>>
+end note
+
+Api -> EventHandler: new EventHandler(topic: str, key: str, data: dict)
+note over EventHandler
+ReviewEventHandler:
+    user_id: uuid
+    film_id: uuid
+    action: str <<create>>
+    rating: smallint
+    timestamp: datetime
+end note
+
+EventHandler -> Kafka: producer.send(topic: str, value: bytes, key: bytes)
+note over Kafka
+topic: <<reviews>>
+end note
+
+Api --> Client: 202 ACCEPTED
+
+== READ ==
+Client -> Api: GET http://127.0.0.1:8000/reviews/{film_id:uuid}
+Api -> Model: get_reviews_by(film_id: uuid)
+Model -> Store: fetch(film_id: uuid)
+Api --> Client: 200 OK -d {data: json} <<List: ReviewModel>>
+
+== UPDATE ==
+Client -> Api: PATCH http://127.0.0.1:8000/reviews/{id:uuid} \n-d {data: dict}\n-h Cookies: access_token=jwt_token
+note over Api
+{
+  text: str
+}
+end note
+Api -> Model: get_review_by(id: uuid, user_id: uuid)
+Model -> Store: update(text:str)
+Api --> Client: 200 OK -d {data: json} <<ReviewModel>>
+
+== DELETE ==
+Client -> Api: DELETE http://127.0.0.1:8000/reviews/{id:uuid} \n-h Cookies: access_token=jwt_token
+Api -> Model: get_reviews_by(id: uuid, user_id: uuid)
+Model -> Store: delete()
+Api -> EventHandler: new EventHandler(topic: str, key: str, data: dict)
+note over EventHandler
+ReviewEventHandler:
+    user_id: uuid
+    film_id: uuid
+    action: str <<delete>>
+    rating: smallint
+    timestamp: datetime
+end note
+
+EventHandler -> Kafka: producer.send(topic: str, value: bytes, key: bytes)
+note over Kafka
+topic: <<reviews>>
+end note
+Api --> Client: 204 NO CONTENT
+
+== REVIEW RATING ==
+Client -> Api: POST http://127.0.0.1:8000/reviews\{id:uuid}\gates \n-d {data: dict}
+note over Api
+{
+  rating: smallint
+}
+end note
+
+Api -> Model: get_reviews_by(id: uuid)
+Model -> Store: update(rating: smallint)
+
+Api -> EventHandler: new EventHandler(topic: str, key: str, data: dict)
+note over EventHandler
+ReviewEventHandler:
+    user_id: uuid
+    film_id: uuid
+    action: str <<gates>>
+    rating: smallint
+    timestamp: datetime
+end note
+
+EventHandler -> Kafka: producer.send(topic: str, value: bytes, key: bytes)
+note over Kafka
+topic: <<reviews>>
+end note
+
+Api --> Client: 201 CREATED
 
 @enduml
