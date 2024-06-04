@@ -1,6 +1,52 @@
 name: practix-analytics
 services:
 
+  elk_elasticsearch:
+    image: elasticsearch:${ELASTIC_VERSION}
+    container_name: ${CONTENT_ELASTIC_HOST}
+    restart: always
+    environment:
+      - xpack.security.enabled=false
+      - "discovery.type=single-node"
+      - ES_JAVA_OPTS=${CONTENT_ELASTIC_ES_JAVA_OPTS}
+      - ELASTIC_HOST=${CONTENT_ELASTIC_HOST}
+      - ELASTIC_PORT=${CONTENT_ELASTIC_PORT}
+    volumes:
+      - elk_elasticsearch_data:/usr/share/elasticsearch/data
+    healthcheck:
+      test: curl -s http://${CONTENT_ELASTIC_HOST}:${CONTENT_ELASTIC_PORT} >/dev/null || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 50
+      start_period: 10s
+    ports:
+      - ${CONTENT_ELASTIC_PORT_LOCAL}:${CONTENT_ELASTIC_PORT}
+
+  elk_kibana:
+    image: kibana:${KIBANA_VERSION}
+    ports:
+      - ${ELK_KIBANA_PORT_LOCAL}:${ELK_KIBANA_PORT}
+    depends_on:
+      elk_elasticsearch:
+        condition: service_healthy
+    environment:
+      - ELASTICSEARCH_HOSTS=http://${CONTENT_ELASTIC_HOST}:${CONTENT_ELASTIC_PORT}
+
+  logstash:
+    image: logstash:${LOGSTASH_VERSION}
+    container_name: ${LOGSTASH_HOST}
+    depends_on:
+      elk_elasticsearch:
+        condition: service_healthy
+    environment:
+      XPACK_MONITORING_ENABLED: "false"
+      ES_HOST: ${CONTENT_ELASTIC_HOST}:${CONTENT_ELASTIC_PORT}
+    ports:
+      - "${LOGSTASH_PORT}:${LOGSTASH_PORT}/udp"
+    volumes:
+      - ./deploy/logstash.conf:/config/logstash.conf:ro
+    command: logstash -f /config/logstash.conf
+
   ugc:
     container_name: movies-ugc
     image: movies-ugc:latest
@@ -152,10 +198,8 @@ services:
       - static:/staticfiles/
     restart: unless-stopped
     depends_on:
-#      elastic:
-#        condition: service_healthy
-#      redis:
-#        condition: service_healthy
+      logstash:
+        condition: service_started
       ugc:
         condition: service_started
     ports:
@@ -168,6 +212,7 @@ volumes:
   kafka_0_data:
   kafka_1_data:
   kafka_2_data:
+  elk_elasticsearch_data:
   static:
 
 networks:
