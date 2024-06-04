@@ -86,7 +86,7 @@ note over Kafka
 topic: <<grades>>
 end note
 
-Api --> Client: 201 CREATED
+Api --> Client: 201 CREATED -d {data: dict} <<GradeModel>>
 
 == READ ==
 Client -> Api: GET http://127.0.0.1:8000/grades/{film_id:uuid} \n-h Cookies: access_token=jwt_token
@@ -182,7 +182,7 @@ note over Kafka
 topic: <<reviews>>
 end note
 
-Api --> Client: 202 ACCEPTED
+Api --> Client: 201 CREATED
 
 == READ ==
 Client -> Api: GET http://127.0.0.1:8000/reviews/{film_id:uuid}
@@ -247,6 +247,73 @@ note over Kafka
 topic: <<reviews>>
 end note
 
-Api --> Client: 201 CREATED
+Api --> Client: 200 OK -d {data: json} <<ReviewModel>>
 
+newpage Favorites UGC Sequence (v2)
+header %date("dd MMMM YYYY")
+
+== CREATE ==
+Client -> Api: POST http://127.0.0.1:8000/favorites \n-d {data: dict}\n-h Cookies: access_token=jwt_token
+note over Api
+{
+  film_id: uuid
+}
+end note
+
+Api -> Model: new FavoriteModel(data: dict)
+note over Model
+FavoriteModel:
+    user_id: uuid
+    film_id: uuid
+    timestamp: datetime
+end note
+
+Model -> Store: save(favorite: FavoriteModel)
+note over Store
+table <<reviews>>
+end note
+
+Api -> EventHandler: new EventHandler(topic: str, key: str, data: dict)
+note over EventHandler
+FavoriteEventHandler:
+    user_id: uuid
+    film_id: uuid
+    action: str <<create>>
+    timestamp: datetime
+end note
+
+EventHandler -> Kafka: producer.send(topic: str, value: bytes, key: bytes)
+note over Kafka
+topic: <<reviews>>
+end note
+
+Api --> Client: 201 CREATED -d {data: json} <<FavoriteModel>>
+
+== READ ==
+Client -> Api: GET http://127.0.0.1:8000/favorites\n-h Cookies: access_token=jwt_token
+Api -> Model: get_favorites_by(user_id: uuid)
+Model -> Store: fetch(user_id: uuid)
+
+Api --> Client: 200 OK -d {data: json} <<List: FavoriteModel>>
+
+== DELETE ==
+Client -> Api: DELETE http://127.0.0.1:8000/favorites/{film_id:uuid}\n-h Cookies: access_token=jwt_token
+Api -> Model: get_favorites_by(film_id: uuid, user_id: uuid)
+Model -> Store: delete()
+
+Api -> EventHandler: new EventHandler(topic: str, key: str, data: dict)
+note over EventHandler
+FavoriteEventHandler:
+    user_id: uuid
+    film_id: uuid
+    action: str <<delete>>
+    timestamp: datetime
+end note
+
+EventHandler -> Kafka: producer.send(topic: str, value: bytes, key: bytes)
+note over Kafka
+topic: <<reviews>>
+end note
+
+Api --> Client: 204 NO CONTENT
 @enduml
