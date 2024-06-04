@@ -5,10 +5,13 @@ services:
     container_name: movies-ugc
     image: movies-ugc:latest
     env_file:
-      - ./.env
+      - ./ugc/.env
     environment:
       - KAFKA_HOST=${KAFKA_BROKER_NAME_0}
       - KAFKA_PORT=${KAFKA_INTERNAL_PORT}
+      - SENTRY_DSN=${SENTRY_DSN}
+      - LOGSTASH_HOST=${LOGSTASH_HOST}
+      - LOGSTASH_PORT=${LOGSTASH_PORT}
     build:
       context: ./ugc/
       dockerfile: Dockerfile
@@ -35,6 +38,7 @@ services:
       - CLICKHOUSE_HOST=${CLICKHOUSE_HOST}
       - CLICKHOUSE_USERNAME=${CLICKHOUSE_USERNAME}
       - CLICKHOUSE_PASSWORD=${CLICKHOUSE_PASSWORD}
+      - SENTRY_DSN=${SENTRY_DSN}
     depends_on:
       kafka-init:
         condition: service_started
