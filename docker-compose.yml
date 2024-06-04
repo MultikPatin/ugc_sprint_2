@@ -143,10 +143,32 @@ services:
     networks:
       - kafka_network
 
+  nginx:
+    image: nginx:${NGINX_VERSION}
+    container_name: gateway
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/configs:/etc/nginx/conf.d:ro
+      - static:/staticfiles/
+    restart: unless-stopped
+    depends_on:
+#      elastic:
+#        condition: service_healthy
+#      redis:
+#        condition: service_healthy
+      ugc:
+        condition: service_started
+    ports:
+      - "443:443"
+      - "80:80"
+    networks:
+      - kafka_network
+
 volumes:
   kafka_0_data:
   kafka_1_data:
   kafka_2_data:
+  static:
 
 networks:
   kafka_network:
