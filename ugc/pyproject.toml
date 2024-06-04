@@ -15,6 +15,8 @@ flask-swagger-ui = "^4.11.1"
 gunicorn = "^22.0.0"
 gevent = "^24.2.1"
 pyjwt = "^2.8.0"
+sentry-sdk = {extras = ["flask"], version = "^2.4.0"}
+python-logstash = "^0.4.8"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -56,6 +58,9 @@ ignore = [
 
 [tool.mypy]
 python_version = "3.11"
+plugins = [
+  "pydantic.mypy",
+]
 follow_imports = "silent"
 warn_redundant_casts = true
 warn_unused_ignores = true

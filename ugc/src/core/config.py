@@ -19,6 +19,15 @@ class AppSettings(EnvSettings):
     debug: bool = Field(default=False)
 
 
+class SentrySettings(EnvSettings):
+    dsn: str = Field(..., alias="SENTRY_DSN")
+
+
+class LogstashSettings(EnvSettings):
+    host: str = Field(..., alias="LOGSTASH_HOST")
+    port: int = Field(..., alias="LOGSTASH_PORT")
+
+
 class SwaggerSettings(EnvSettings):
     project_name: str = Field(default="UGC Service")
     docs_url: str = "/api/openapi"
@@ -38,6 +47,8 @@ class KafkaSettings(EnvSettings):
 
 class Settings(BaseSettings):
     app: AppSettings = AppSettings()
+    sentry: SentrySettings = SentrySettings()
+    logstash: LogstashSettings = LogstashSettings()
     swagger: SwaggerSettings = SwaggerSettings()
     kafka: KafkaSettings = KafkaSettings()
 

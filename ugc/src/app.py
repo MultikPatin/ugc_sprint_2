@@ -1,3 +1,6 @@
+import logging
+
+import logstash
 from flask import Flask
 from flask_swagger_ui import get_swaggerui_blueprint
 
@@ -20,6 +23,12 @@ def init_kafka(kafka_init_app: KafkaInit = get_kafka_init()):
 
 def create_app():
     flask_app = Flask(__name__)
+
+    flask_app.logger = logging.getLogger(__name__)
+    flask_app.logger.setLevel(logging.DEBUG)
+    flask_app.logger.addHandler(logstash.LogstashHandler(settings.logstash.host, settings.logstash.port, version=1))
+    flask_app.logger.addHandler(logging.StreamHandler())
+
     flask_app.register_blueprint(swagger_blueprint)
     flask_app.register_blueprint(event_routers)
 
