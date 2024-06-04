@@ -1,3 +1,6 @@
+from typing import List
+
+from psycopg2.extensions import connection as _connection
 from pymongo.mongo_client import MongoClient
 
 from utils import timeit
@@ -77,3 +80,53 @@ class MongoManager:
 
         )
         return [r for r in result]
+
+
+class PGManager:
+    def __init__(self, connection: _connection) -> None:
+        self.connection = connection
+
+    def create_initial_tables(self) -> None:
+        with self.connection.cursor() as cursor:
+            reviews: str = """
+            CREATE TABLE IF NOT EXISTS reviews (id uuid PRIMARY KEY, title varchar(255), body TEXT, created_at 
+            timestamp, author UUID, movie UUID)
+            """
+            cursor.execute(reviews)
+            reviews_likes: str = """
+            CREATE TABLE IF NOT EXISTS reviews_likes (id serial PRIMARY KEY, review uuid, rating smallint, user_id uuid)
+            """
+            cursor.execute(reviews_likes)
+            movies_likes: str = """
+            CREATE TABLE IF NOT EXISTS movies_likes (id serial PRIMARY KEY, movie uuid, rating smallint, user_id uuid)
+            """
+            cursor.execute(movies_likes)
+            bookmarks: str = """
+            CREATE TABLE IF NOT EXISTS bookmarks (id serial PRIMARY KEY,  user_id uuid, movies varchar[])
+            """
+            cursor.execute(bookmarks)
+            self.connection.commit()
+
+    @timeit
+    def insert_data(self, data: List[list], table_name: str, col_count: int):
+        """
+        Метод для вставки данных
+        """
+        col_placeholders: str = ', '.join(['%s'] * col_count)
+        with self.connection.cursor() as cursor:
+            args_str = ','.join(cursor.mogrify(f"({col_placeholders})", i).decode('utf-8')
+                                for i in data)
+            cursor.execute(f"INSERT INTO {table_name} VALUES " + args_str + " ON CONFLICT DO NOTHING")
+            self.connection.commit()
+
+    @timeit
+    def insert_bookmarks(self, data: List[list]):
+        """
+        Метод для вставки закладок пользователя
+        """
+        with self.connection.cursor() as cursor:
+            for row in data:
+                row[2] = row[2].split(',')
+                query = f"""INSERT INTO bookmarks (id, user_id, movies) VALUES ({row[0]}, '{row[1]}', ARRAY{row[2]})"""
+                cursor.execute(query)
+                self.connection.commit()

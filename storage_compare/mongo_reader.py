@@ -2,8 +2,10 @@ from pymongo import MongoClient
 
 from service import MongoManager
 
+from config import settings
+
 if __name__ == '__main__':
-    client = MongoClient("localhost", 27017)
+    client: MongoClient = MongoClient(settings.mongo.host, settings.mongo.port)
 
     manager = MongoManager(client)
     manager.get_user_bookmarks("edb44b78-827f-4b42-9a68-0f22da96ee41")
