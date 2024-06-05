@@ -87,6 +87,9 @@ class PGManager:
         self.connection = connection
 
     def create_initial_tables(self) -> None:
+        """
+        Метод создания необходимого для работы набора таблиц
+        """
         with self.connection.cursor() as cursor:
             reviews: str = """
             CREATE TABLE IF NOT EXISTS reviews (id uuid PRIMARY KEY, title varchar(255), body TEXT, created_at 
@@ -130,3 +133,43 @@ class PGManager:
                 query = f"""INSERT INTO bookmarks (id, user_id, movies) VALUES ({row[0]}, '{row[1]}', ARRAY{row[2]})"""
                 cursor.execute(query)
                 self.connection.commit()
+
+    @timeit
+    def get_likes_by_user(self, user_id: str):
+        """
+        Метод для запроса списка фильмов, которые понравились пользователю
+        """
+        with self.connection.cursor() as cursor:
+            query: str = f"""SELECT * FROM movies_likes WHERE user_id = '{user_id}' and rating = 10"""
+            cursor.execute(query)
+            return cursor.fetchall()
+
+    @timeit
+    def get_user_bookmarks(self, user_id: str) -> list:
+        """
+        Метод получения списка закладок пользователя
+        """
+        with self.connection.cursor() as cursor:
+            query: str = f"""SELECT * FROM bookmarks WHERE user_id = '{user_id}'"""
+            cursor.execute(query)
+            return cursor.fetchall()
+
+    @timeit
+    def get_movie_likes_count(self, movie_id: str, rating: int = 10):
+        """
+        Метод получения количества лайков или дизлайков (10 - лайки, 0 - дизлайки) у фильма
+        """
+        with self.connection.cursor() as cursor:
+            query: str = f"""SELECT count(*) FROM movies_likes WHERE movie = '{movie_id}' and rating = {rating}"""
+            cursor.execute(query)
+            return cursor.fetchone()
+
+    @timeit
+    def get_average_movies_rating(self) -> list:
+        """
+        Метод получения средней оценки по фильмам
+        """
+        with self.connection.cursor() as cursor:
+            query: str = """SELECT movie, AVG(rating) AS average_rating FROM movies_likes GROUP BY movie;"""
+            cursor.execute(query)
+            return cursor.fetchall()
