@@ -32,7 +32,6 @@ jobs:
         with:
           virtualenvs-create: true
           virtualenvs-in-project: true
-          installer-parallel: true
 
       #----------------------------------------------
       #       load cached venv if cache exists
@@ -90,7 +89,6 @@ jobs:
         with:
           virtualenvs-create: true
           virtualenvs-in-project: true
-          installer-parallel: true
 
       #----------------------------------------------
       #       load cached venv if cache exists
@@ -109,7 +107,7 @@ jobs:
         if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
         run: |
           cd etl_analytics
-          poetry install --no-interaction --no-root
+          poetry install --all-extras --no-interaction --no-root
 
       #----------------------------------------------
       #              run test suite
