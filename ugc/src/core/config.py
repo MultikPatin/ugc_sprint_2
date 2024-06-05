@@ -36,10 +36,16 @@ class KafkaSettings(EnvSettings):
         return f"{self.kafka_host}:{self.kafka_port}"
 
 
+class MongoDBSettings(EnvSettings):
+    mongodb_uri: str = Field(default="mongodb://localhost:27017")
+    mongo_db_name: str = Field(default="ugc")
+
+
 class Settings(BaseSettings):
     app: AppSettings = AppSettings()
     swagger: SwaggerSettings = SwaggerSettings()
     kafka: KafkaSettings = KafkaSettings()
+    mongodb: MongoDBSettings = MongoDBSettings()
 
 
 settings = Settings()
