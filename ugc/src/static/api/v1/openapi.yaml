@@ -8,6 +8,8 @@ servers:
 tags:
   - name: events
     description: "Event data for analysis users actions"
+  - name: grades
+    description: "Оценка пользователя к фильму"
 paths:
   /events:
     post:
@@ -31,6 +33,27 @@ paths:
           description: Successful operation
         '400':
           description: Invalid request, missing required parameters
+        '403':
+          description: Forbidden
+
+  /grades:
+    post:
+      tags:
+        - grades
+      requestBody:
+        description: Create a new user event
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Grade'
+
+      responses:
+        '201':
+          description: Successful operation
+        '400':
+          description: Invalid request, missing required parameters
+        '403':
+          description: Forbidden
 
 components:
   securitySchemes:
@@ -63,6 +86,20 @@ components:
         action:
           type: string
           example: Начало просмотра
+
+    Grade:
+      required:
+        - film_id
+        - rating
+      type: object
+      properties:
+        film_id:
+          type: string
+          example: cf083ea9-aa9f-4dd0-b8ee-29393c1a0a31
+        rating:
+          type: integer
+          format: int32
+          example: 10
 
 security:
   - cookieAuth: []

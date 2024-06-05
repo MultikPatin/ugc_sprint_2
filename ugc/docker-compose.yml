@@ -1,5 +1,7 @@
 services:
   ugc:
+    profiles:
+      - dev
     container_name: movies-ugc
     image: movies-ugc:latest
     env_file:
@@ -93,10 +95,19 @@ services:
     networks:
       - kafka_network
 
+  mongodb:
+    image: mongo
+    ports:
+      - "27017:27017"
+    restart: unless-stopped
+    volumes:
+      - mongodb_data:/data/db
+
 volumes:
   kafka_0_data:
   kafka_1_data:
   kafka_2_data:
+  mongodb_data:
 
 networks:
   kafka_network:

@@ -14,16 +14,6 @@ routers = Blueprint("events", __name__, url_prefix=PREFIX_BASE_ROUTE + "/events"
 event_handler = get_event_handler()
 
 
-@routers.errorhandler(HTTPStatus.BAD_REQUEST)
-def resource_not_found(event):
-    return jsonify(error=str(event)), HTTPStatus.BAD_REQUEST
-
-
-@routers.errorhandler(HTTPStatus.FORBIDDEN)
-def resource_forbidden(event):
-    return jsonify(error=str(event)), HTTPStatus.FORBIDDEN
-
-
 @routers.route("/", methods=["POST"], strict_slashes=False)
 @check_access_token
 def events(user: AuthUser):

@@ -3,7 +3,7 @@ from typing import Any
 
 from kafka.admin import KafkaAdminClient, NewTopic
 
-from .config import settings
+from src.core.config import settings
 
 TOPIC_LIST: list[str] = ["events"]
 

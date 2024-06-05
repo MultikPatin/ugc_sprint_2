@@ -15,6 +15,8 @@ flask-swagger-ui = "^4.11.1"
 gunicorn = "^22.0.0"
 gevent = "^24.2.1"
 pyjwt = "^2.8.0"
+beanie = "^1.26.0"
+fast-depends = "^2.4.3"
 
 
 [tool.poetry.group.dev.dependencies]

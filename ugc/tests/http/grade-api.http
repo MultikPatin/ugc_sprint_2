@@ -1,0 +1,109 @@
+### Send POST request with json body
+POST http://127.0.0.1:5000/api/v1/grades
+Content-Type: application/json
+Cookie: access_token={{valid_access_token}}
+
+{
+  "film_id": "cf083ea9-aa9f-4dd0-b8ee-29393c1a0a31",
+  "rating": 10
+}
+
+> {%
+    client.test("Request executed successfully", function () {
+        client.assert(response.status === 201, "Response status is not 201");
+    });
+%}
+
+### Without key: check response status is 400
+POST http://127.0.0.1:5000/api/v1/grades
+Content-Type: application/json
+Cookie: access_token={{valid_access_token}}
+
+{
+  "film_id": "cf083ea9-aa9f-4dd0-b8ee-29393c1a0a31",
+  "rating": 11
+}
+
+> {%
+    client.test("Request executed successfully", function () {
+        client.assert(response.status === 400, "Response status is not 400");
+    });
+%}
+
+### Without parameter: check response status is 400
+POST http://127.0.0.1:5000/api/v1/grades
+Content-Type: application/json
+Cookie: access_token={{valid_access_token}}
+
+{
+  "film_id": "cf083ea9-aa9f-4dd0-b8ee-29393c1a0a31"
+}
+
+> {%
+    client.test("Request executed successfully", function () {
+        client.assert(response.status === 400, "Response status is not 400");
+    });
+%}
+
+### Without access_token: check response status is 403
+POST http://127.0.0.1:5000/api/v1/grades
+Content-Type: application/json
+
+{
+  "film_id": "cf083ea9-aa9f-4dd0-b8ee-29393c1a0a31",
+  "rating": 11
+}
+
+> {%
+    client.test("Request executed successfully", function () {
+        client.assert(response.status === 403, "Response status is not 403");
+    });
+%}
+
+### Expired access_token: check response status is 403
+POST http://127.0.0.1:5000/api/v1/grades
+Content-Type: application/json
+Cookie: access_token={{expired_access_token}}
+
+{
+  "film_id": "cf083ea9-aa9f-4dd0-b8ee-29393c1a0a31",
+  "rating": 11
+}
+
+> {%
+    client.test("Request executed successfully", function () {
+        client.assert(response.status === 403, "Response status is not 403");
+    });
+%}
+
+### Invalid access_token: check response status is 403
+POST http://127.0.0.1:5000/api/v1/grades
+Content-Type: application/json
+Cookie: access_token={{invalid_access_token}}
+
+{
+  "film_id": "cf083ea9-aa9f-4dd0-b8ee-29393c1a0a31",
+  "rating": 11
+}
+
+> {%
+    client.test("Request executed successfully", function () {
+        client.assert(response.status === 403, "Response status is not 403");
+    });
+%}
+
+### Validated error access_token data: check response status is 403
+POST http://127.0.0.1:5000/api/v1/grades
+Content-Type: application/json
+Cookie: access_token={{user_login_access_token}}
+
+{
+  "film_id": "cf083ea9-aa9f-4dd0-b8ee-29393c1a0a31",
+  "rating": 11
+}
+
+> {%
+    client.test("Request executed successfully", function () {
+        client.assert(response.status === 403, "Response status is not 403");
+    });
+%}
