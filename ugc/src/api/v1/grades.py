@@ -15,10 +15,9 @@ routers = Blueprint("grades", __name__, url_prefix=PREFIX_BASE_ROUTE + "/grades"
 @check_access_token
 def create(user: AuthUser):
     request_data = request.json
-    request_data["user_id"] = user.id
     try:
         data_model = GradeModel.model_validate(request_data)
+        data_model.user_id = user.id
         return jsonify(data_model.model_dump()), HTTPStatus.CREATED
     except ValidationError:
         abort(HTTPStatus.BAD_REQUEST, description="Missing required parameter")
-

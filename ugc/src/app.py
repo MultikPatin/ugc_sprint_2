@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fast_depends import inject, Depends
+from fast_depends import Depends, inject
 from flask import Flask, jsonify
 from flask_swagger_ui import get_swaggerui_blueprint
 from werkzeug.exceptions import HTTPException
@@ -30,7 +30,7 @@ def create_app():
     flask_app.register_blueprint(event_routers)
     flask_app.register_blueprint(grade_routers)
 
-    init_kafka()
+    init_kafka()  # type:ignore
 
     return flask_app
 
