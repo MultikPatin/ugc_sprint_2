@@ -141,7 +141,7 @@ Cookie: access_token={{valid_access_token}}
 }
 
 
-### Get grade by film. Send GET request with json body
+### Get grade by film. Send GET request
 GET http://127.0.0.1:5000/api/v1/grades/{{film_id}}
 Content-Type: application/json
 Cookie: access_token={{valid_access_token}}
@@ -161,6 +161,18 @@ Cookie: access_token={{valid_access_token}}
 > {%
     client.test("Request executed successfully", function () {
         client.assert(response.status === 404, "Response status is not 404");
+    });
+%}
+
+
+### Get list grade by user. Send GET request
+GET http://127.0.0.1:5000/api/v1/grades
+Content-Type: application/json
+Cookie: access_token={{valid_access_token}}
+
+> {%
+    client.test("Request executed successfully", function () {
+        client.assert(response.status === 200, "Response status is not 200");
     });
 %}
 

@@ -14,8 +14,10 @@ class GradeManager:
         self.collection = Grade
 
     def find_one(self, condition: dict[str, Any]) -> Grade | None:
-        result = self.collection.find_one(condition).run()
-        return result
+        return self.collection.find_one(condition).run()
+
+    def find_all(self, user_id: str) -> list[Grade]:
+        return self.collection.find({"user_id": user_id}).to_list()
 
     def create(self, data: dict) -> Grade:
         grade = Grade.model_validate(data)

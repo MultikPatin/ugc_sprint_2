@@ -32,6 +32,15 @@ def create(user: AuthUser, grade_manager: Annotated[GradeManager, Depends(get_gr
         abort(HTTPStatus.BAD_REQUEST, description="Missing required parameter")
 
 
+@routers.route("/", methods=["GET"], strict_slashes=False)
+@check_access_token
+@inject
+def get_all(user: AuthUser, grade_manager: Annotated[GradeManager, Depends(get_grade_manager)]):
+    grades = grade_manager.find_all(user_id=user.id)
+
+    return jsonify([grade.model_dump() for grade in grades]), HTTPStatus.OK
+
+
 @routers.route("/<uuid:film_id>", methods=["GET"], strict_slashes=False)
 @check_access_token
 @inject
