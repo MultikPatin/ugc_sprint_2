@@ -1,4 +1,3 @@
-import asyncio
 from typing import Annotated
 
 from fast_depends import Depends, inject
@@ -27,14 +26,14 @@ def init_kafka(kafka_init_app: Annotated[KafkaInit, Depends(get_kafka_init)]):
 
 
 @inject
-async def init_mongodb(mongodb_init_app: Annotated[MongoDBInit, Depends(get_mongodb_init)]):
-    await mongodb_init_app.create_collections()
+def init_mongodb(mongodb_init_app: Annotated[MongoDBInit, Depends(get_mongodb_init)]):
+    mongodb_init_app.create_collections()
 
 
 def create_app():
     flask_app = Flask(__name__)
 
-    asyncio.run(init_mongodb())  # type:ignore
+    init_mongodb()  # type:ignore
 
     flask_app.register_blueprint(swagger_blueprint)
     flask_app.register_blueprint(event_routers)

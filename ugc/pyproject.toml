@@ -17,6 +17,7 @@ gevent = "^24.2.1"
 pyjwt = "^2.8.0"
 beanie = "^1.26.0"
 fast-depends = "^2.4.3"
+bunnet = "^1.3.0"
 
 
 [tool.poetry.group.dev.dependencies]

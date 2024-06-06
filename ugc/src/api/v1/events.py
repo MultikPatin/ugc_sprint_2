@@ -16,7 +16,7 @@ event_handler = get_event_handler()
 
 @routers.route("/", methods=["POST"], strict_slashes=False)
 @check_access_token
-async def events(user: AuthUser):
+def events(user: AuthUser):
     key_event = request.args.get("key")
     request_data = request.json
 

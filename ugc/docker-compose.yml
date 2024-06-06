@@ -96,12 +96,14 @@ services:
       - kafka_network
 
   mongodb:
-    image: mongo
+    image: mongo:4.4.29
     ports:
       - "27017:27017"
     restart: unless-stopped
     volumes:
       - mongodb_data:/data/db
+    networks:
+      - kafka_network
 
 volumes:
   kafka_0_data:

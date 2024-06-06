@@ -176,3 +176,4 @@ infra/db/
 !/src/etl_permission/state.json
 
 local/
+.idea/httpRequests/
