@@ -90,7 +90,7 @@ Api --> Client: 201 CREATED -d {data: dict} <<GradeModel>>
 
 == READ ==
 Client -> Api: GET http://127.0.0.1:8000/grades/{film_id:uuid} \n-h Cookies: access_token=jwt_token
-Api -> Model: get_grade_by(film_id: uuid)
+Api -> Model: get_grade_by(film_id: uuid, user_id: uuid)
 Model -> Store: fetch(film_id: uuid)
 Api --> Client: 200 OK -d {data: json} <<GradeModel>>
 
@@ -101,7 +101,7 @@ note over Api
   rating: smallint
 }
 end note
-Api -> Model: get_grade_by(film_id: uuid)
+Api -> Model: get_grade_by(film_id: uuid, user_id: uuid)
 Model -> Store: update(rating: smallint)
 
 Api -> EventHandler: new EventHandler(topic: str, key: str, data: dict)

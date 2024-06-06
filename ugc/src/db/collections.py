@@ -13,6 +13,7 @@ class Favorite(Document):
     class Settings:
         name = "favorites"
         use_state_management = True
+        state_management_save_previous = True
 
 
 class Grade(Document):
@@ -24,6 +25,7 @@ class Grade(Document):
     class Settings:
         name = "grades"
         use_state_management = True
+        state_management_save_previous = True
 
 
 class Review(Document):
@@ -37,3 +39,4 @@ class Review(Document):
     class Settings:
         name = "reviews"
         use_state_management = True
+        state_management_save_previous = True

@@ -12,18 +12,24 @@ class GradeManager:
         self.client = client
         self.collection = Grade
 
-    def exist(self, condition: dict[str, Any]) -> Grade | None:
+    def find_one(self, condition: dict[str, Any]) -> Grade | None:
         result = self.collection.find_one(condition).run()
         return result
 
-    def create(self, data: dict[str, Any]):
-        document = self.collection(**data)
+    def create(self, data: dict) -> Grade:
+        grade = Grade.model_validate(data)
 
-        exist_document = self.exist({"user_id": document.user_id, "film_id": document.film_id})
+        exist_document = self.find_one({"user_id": grade.user_id, "film_id": grade.film_id})
         if exist_document is not None:
             return exist_document
 
-        return document.create()
+        return grade.create()
+
+    def update(self, grade: Grade, rating: int) -> Grade:
+        grade.rating = rating
+        grade.save_changes()
+
+        return grade
 
 
 @inject

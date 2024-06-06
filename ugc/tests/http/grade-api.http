@@ -1,10 +1,10 @@
-### Send POST request with json body
+### Create grade film. Send POST request with json body.
 POST http://127.0.0.1:5000/api/v1/grades
 Content-Type: application/json
 Cookie: access_token={{valid_access_token}}
 
 {
-  "film_id": "cf083ea9-aa9f-4dd0-b8ee-29393c1a0a31",
+  "film_id": "{{film_id}}",
   "rating": 10
 }
 
@@ -20,7 +20,7 @@ Content-Type: application/json
 Cookie: access_token={{valid_access_token}}
 
 {
-  "film_id": "cf083ea9-aa9f-4dd0-b8ee-29393c1a0a31",
+  "film_id": "{{film_id}}",
   "rating": 11
 }
 
@@ -36,7 +36,7 @@ Content-Type: application/json
 Cookie: access_token={{valid_access_token}}
 
 {
-  "film_id": "cf083ea9-aa9f-4dd0-b8ee-29393c1a0a31"
+  "film_id": "{{film_id}}"
 }
 
 > {%
@@ -50,7 +50,7 @@ POST http://127.0.0.1:5000/api/v1/grades
 Content-Type: application/json
 
 {
-  "film_id": "cf083ea9-aa9f-4dd0-b8ee-29393c1a0a31",
+  "film_id": "{{film_id}}",
   "rating": 11
 }
 
@@ -66,7 +66,7 @@ Content-Type: application/json
 Cookie: access_token={{expired_access_token}}
 
 {
-  "film_id": "cf083ea9-aa9f-4dd0-b8ee-29393c1a0a31",
+  "film_id": "{{film_id}}",
   "rating": 11
 }
 
@@ -82,7 +82,7 @@ Content-Type: application/json
 Cookie: access_token={{invalid_access_token}}
 
 {
-  "film_id": "cf083ea9-aa9f-4dd0-b8ee-29393c1a0a31",
+  "film_id": "{{film_id}}",
   "rating": 11
 }
 
@@ -98,12 +98,28 @@ Content-Type: application/json
 Cookie: access_token={{user_login_access_token}}
 
 {
-  "film_id": "cf083ea9-aa9f-4dd0-b8ee-29393c1a0a31",
-  "rating": 11
+  "film_id": "{{film_id}}",
+  "rating": 10
 }
 
 > {%
     client.test("Request executed successfully", function () {
         client.assert(response.status === 403, "Response status is not 403");
+    });
+%}
+
+### Update grade film. Send PATCH request with json body
+PATCH http://127.0.0.1:5000/api/v1/grades/{{film_id}}
+Content-Type: application/json
+Cookie: access_token={{valid_access_token}}
+
+{
+  "rating": 6
+}
+
+
+> {%
+    client.test("Request executed successfully", function () {
+        client.assert(response.status === 200, "Response status is not 200");
     });
 %}
