@@ -123,3 +123,36 @@ Cookie: access_token={{valid_access_token}}
         client.assert(response.status === 200, "Response status is not 200");
     });
 %}
+
+### Film not found: check response status is 404
+PATCH http://127.0.0.1:5000/api/v1/grades/{{not_found_film_id}}
+Content-Type: application/json
+Cookie: access_token={{valid_access_token}}
+
+{
+  "rating": 6
+}
+
+### Update grade film. Send PATCH request with json body
+GET http://127.0.0.1:5000/api/v1/grades/{{film_id}}
+Content-Type: application/json
+Cookie: access_token={{valid_access_token}}
+
+
+> {%
+    client.test("Request executed successfully", function () {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+%}
+
+### Film not found: check response status is 404
+GET http://127.0.0.1:5000/api/v1/grades/{{not_found_film_id}}
+Content-Type: application/json
+Cookie: access_token={{valid_access_token}}
+
+
+> {%
+    client.test("Request executed successfully", function () {
+        client.assert(response.status === 404, "Response status is not 404");
+    });
+%}

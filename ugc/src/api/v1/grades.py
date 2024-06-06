@@ -32,6 +32,18 @@ def create(user: AuthUser, grade_manager: Annotated[GradeManager, Depends(get_gr
         abort(HTTPStatus.BAD_REQUEST, description="Missing required parameter")
 
 
+@routers.route("/<uuid:film_id>", methods=["GET"], strict_slashes=False)
+@check_access_token
+@inject
+def get(user: AuthUser, film_id: UUID, grade_manager: Annotated[GradeManager, Depends(get_grade_manager)]):
+    grade = grade_manager.find_one({"user_id": user.id, "film_id": str(film_id)})
+
+    if grade is None:
+        abort(HTTPStatus.NOT_FOUND, description="Film not found")
+
+    return jsonify(grade.model_dump()), HTTPStatus.OK
+
+
 @routers.route("/<uuid:film_id>", methods=["PATCH"], strict_slashes=False)
 @check_access_token
 @inject

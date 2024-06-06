@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 from typing import Annotated, Any
 
 from fast_depends import Depends, inject
@@ -27,6 +28,7 @@ class GradeManager:
 
     def update(self, grade: Grade, rating: int) -> Grade:
         grade.rating = rating
+        grade.timestamp = datetime.now(timezone.utc)
         grade.save_changes()
 
         return grade
