@@ -18,7 +18,7 @@ def get_data_jwt(encode_jwt: str) -> dict[str, Any] | None:
 
 def check_access_token(func):
     @functools.wraps(func)
-    def checking(*args, **kwargs):
+    async def checking(*args, **kwargs):
         cookies = request.cookies.to_dict()
         access_jwt = cookies.get("access_token")
         if access_jwt is None:
@@ -48,6 +48,6 @@ def check_access_token(func):
                 description="Invalid authorization code.",
             )
 
-        return func(*args, **kwargs)
+        return await func(*args, **kwargs)
 
     return checking

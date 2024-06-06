@@ -2,9 +2,7 @@ from beanie import init_beanie
 from motor.motor_asyncio import AsyncIOMotorClient
 
 from src.core.config import settings
-from src.models.favorites import Favorite
-from src.models.grades import Grade
-from src.models.reviews import Review
+from src.db.collections import Favorite, Grade, Review
 
 
 def get_mongo_client() -> AsyncIOMotorClient:
