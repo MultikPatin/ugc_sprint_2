@@ -26,12 +26,17 @@ class GradeManager:
 
         return grade.create()
 
-    def update(self, grade: Grade, rating: int) -> Grade:
+    @staticmethod
+    def update(grade: Grade, rating: int) -> Grade:
         grade.rating = rating
         grade.timestamp = datetime.now(timezone.utc)
         grade.save_changes()
 
         return grade
+
+    @staticmethod
+    def delete(grade: Grade) -> None:
+        grade.delete()
 
 
 @inject
