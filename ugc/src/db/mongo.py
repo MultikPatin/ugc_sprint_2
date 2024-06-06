@@ -13,8 +13,8 @@ class MongoDBInit:
     def __init__(self, mongodb_client: MongoClient):
         self.client = mongodb_client
 
-    def create_collections(self):
-        init_bunnet(database=self.client.ugc, document_models=[Grade, Review, Favorite])
+    def create_collections(self) -> None:
+        init_bunnet(database=self.client.ugc, document_models=[Grade, Review, Favorite])  # type:ignore
 
 
 def get_mongodb_init() -> MongoDBInit:

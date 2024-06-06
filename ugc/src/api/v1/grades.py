@@ -1,7 +1,7 @@
 from http import HTTPStatus
 from typing import Annotated
 
-from fast_depends import inject, Depends
+from fast_depends import Depends, inject
 from flask import Blueprint, abort, jsonify, request
 from pydantic import ValidationError
 

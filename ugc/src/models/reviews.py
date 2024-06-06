@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 from uuid import UUID, uuid4
 
-from pydantic import Field, BaseModel
+from pydantic import BaseModel, Field
 
 
 class ReviewModel(BaseModel):

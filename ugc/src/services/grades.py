@@ -1,6 +1,6 @@
 from typing import Annotated, Any
 
-from fast_depends import inject, Depends
+from fast_depends import Depends, inject
 from pymongo import MongoClient
 
 from src.db.collections import Grade
@@ -27,7 +27,5 @@ class GradeManager:
 
 
 @inject
-def get_grade_manager(
-        client: Annotated[MongoClient, Depends(get_mongo_client)]
-):
+def get_grade_manager(client: Annotated[MongoClient, Depends(get_mongo_client)]):
     return GradeManager(client=client)
