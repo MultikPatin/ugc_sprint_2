@@ -1,10 +1,10 @@
-### Create grade film. Send POST request with json body.
-POST http://127.0.0.1:5000/api/v1/grades/{{film_id}}
+### Create review by film. Send POST request.
+POST http://127.0.0.1:5000/api/v1/reviews/{{film_id}}
 Content-Type: application/json
 Cookie: access_token={{valid_access_token}}
 
 {
-  "rating": 10
+  "text": "Рецензия к фильму."
 }
 
 > {%
@@ -14,14 +14,26 @@ Cookie: access_token={{valid_access_token}}
 %}
 
 
-### Without key: check response status is 400
-POST http://127.0.0.1:5000/api/v1/grades/{{film_id}}
+### Without key: check response status is 404
+POST http://127.0.0.1:5000/api/v1/reviews
 Content-Type: application/json
 Cookie: access_token={{valid_access_token}}
 
 {
-  "rating": 11
+  "text": "Рецензия к фильму."
 }
+
+> {%
+    client.test("Request executed successfully", function () {
+        client.assert(response.status === 404, "Response status is not 404");
+    });
+%}
+
+
+### Without text: check response status is 400
+POST http://127.0.0.1:5000/api/v1/reviews/{{film_id}}
+Content-Type: application/json
+Cookie: access_token={{valid_access_token}}
 
 > {%
     client.test("Request executed successfully", function () {
@@ -30,24 +42,28 @@ Cookie: access_token={{valid_access_token}}
 %}
 
 
-### Without parameter: check response status is 400
-POST http://127.0.0.1:5000/api/v1/grades/{{film_id}}
+### Without key: check response status is 404
+POST http://127.0.0.1:5000/api/v1/reviews
 Content-Type: application/json
 Cookie: access_token={{valid_access_token}}
 
+{
+  "text": "Рецензия к фильму."
+}
+
 > {%
     client.test("Request executed successfully", function () {
-        client.assert(response.status === 400, "Response status is not 400");
+        client.assert(response.status === 404, "Response status is not 404");
     });
 %}
 
 
 ### Without access_token: check response status is 403
-POST http://127.0.0.1:5000/api/v1/grades/{{film_id}}
+POST http://127.0.0.1:5000/api/v1/reviews/{{film_id}}
 Content-Type: application/json
 
 {
-  "rating": 11
+  "text": "Рецензия к фильму."
 }
 
 > {%
@@ -58,12 +74,12 @@ Content-Type: application/json
 
 
 ### Expired access_token: check response status is 403
-POST http://127.0.0.1:5000/api/v1/grades/{{film_id}}
+POST http://127.0.0.1:5000/api/v1/reviews/{{film_id}}
 Content-Type: application/json
 Cookie: access_token={{expired_access_token}}
 
 {
-  "rating": 11
+  "text": "Рецензия к фильму."
 }
 
 > {%
@@ -74,12 +90,12 @@ Cookie: access_token={{expired_access_token}}
 
 
 ### Invalid access_token: check response status is 403
-POST http://127.0.0.1:5000/api/v1/grades/{{film_id}}
+POST http://127.0.0.1:5000/api/v1/reviews/{{film_id}}
 Content-Type: application/json
 Cookie: access_token={{invalid_access_token}}
 
 {
-  "rating": 11
+  "text": "Рецензия к фильму."
 }
 
 > {%
@@ -90,12 +106,12 @@ Cookie: access_token={{invalid_access_token}}
 
 
 ### Validated error access_token data: check response status is 403
-POST http://127.0.0.1:5000/api/v1/grades/{{film_id}}
+POST http://127.0.0.1:5000/api/v1/reviews/{{film_id}}
 Content-Type: application/json
 Cookie: access_token={{user_login_access_token}}
 
 {
-  "rating": 10
+  "text": "Рецензия к фильму."
 }
 
 > {%
@@ -105,34 +121,8 @@ Cookie: access_token={{user_login_access_token}}
 %}
 
 
-### Update grade film. Send PATCH request with json body
-PATCH http://127.0.0.1:5000/api/v1/grades/{{film_id}}
-Content-Type: application/json
-Cookie: access_token={{valid_access_token}}
-
-{
-  "rating": 6
-}
-
-> {%
-    client.test("Request executed successfully", function () {
-        client.assert(response.status === 200, "Response status is not 200");
-    });
-%}
-
-
-### Film not found: check response status is 404
-PATCH http://127.0.0.1:5000/api/v1/grades/{{not_found_uuid}}
-Content-Type: application/json
-Cookie: access_token={{valid_access_token}}
-
-{
-  "rating": 6
-}
-
-
-### Get grade by film. Send GET request
-GET http://127.0.0.1:5000/api/v1/grades/{{film_id}}
+### Get list review films. Send GET request
+GET http://127.0.0.1:5000/api/v1/reviews
 Content-Type: application/json
 Cookie: access_token={{valid_access_token}}
 
@@ -143,10 +133,42 @@ Cookie: access_token={{valid_access_token}}
 %}
 
 
-### Film not found: check response status is 404
-GET http://127.0.0.1:5000/api/v1/grades/{{not_found_uuid}}
+### Get review. Send GET request
+GET http://127.0.0.1:5000/api/v1/reviews/{{film_id}}
 Content-Type: application/json
 Cookie: access_token={{valid_access_token}}
+
+> {%
+    client.test("Request executed successfully", function () {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+%}
+
+
+### Update review. Send PATCH request
+PATCH http://127.0.0.1:5000/api/v1/reviews/{{film_id}}
+Content-Type: application/json
+Cookie: access_token={{valid_access_token}}
+
+{
+  "text": "Обновленная рецензия к фильму"
+}
+
+> {%
+    client.test("Request executed successfully", function () {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+%}
+
+
+### Not found: check response status is 404
+PATCH http://127.0.0.1:5000/api/v1/reviews/{{not_found_uuid}}
+Content-Type: application/json
+Cookie: access_token={{valid_access_token}}
+
+{
+  "text": "Обновленная рецензия к фильму"
+}
 
 > {%
     client.test("Request executed successfully", function () {
@@ -155,20 +177,8 @@ Cookie: access_token={{valid_access_token}}
 %}
 
 
-### Get list grade by user. Send GET request
-GET http://127.0.0.1:5000/api/v1/grades
-Content-Type: application/json
-Cookie: access_token={{valid_access_token}}
-
-> {%
-    client.test("Request executed successfully", function () {
-        client.assert(response.status === 200, "Response status is not 200");
-    });
-%}
-
-
-### Delete grade by film. Send DELETE request with json body
-DELETE http://127.0.0.1:5000/api/v1/grades/{{film_id}}
+### Delete review. Send DELETE request with json body
+DELETE http://127.0.0.1:5000/api/v1/reviews/{{film_id}}
 Content-Type: application/json
 Cookie: access_token={{valid_access_token}}
 
@@ -179,8 +189,8 @@ Cookie: access_token={{valid_access_token}}
 %}
 
 
-### Film not found: check response status is 404
-DELETE http://127.0.0.1:5000/api/v1/grades/{{not_found_uuid}}
+### Not found: check response status is 404
+DELETE http://127.0.0.1:5000/api/v1/reviews/{{not_found_uuid}}
 Content-Type: application/json
 Cookie: access_token={{valid_access_token}}
 

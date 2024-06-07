@@ -9,9 +9,11 @@ tags:
   - name: events
     description: "Пользовательские события"
   - name: grades
-    description: "Оценка пользователя к фильму"
+    description: "Оценка пользователей к фильму"
   - name: favorites
-    description: "Закладки пользователя, избранные фильмы"
+    description: "Закладки пользователей, избранные фильмы"
+  - name: reviews
+    description: "Рецензии пользователей к фильму"
 paths:
   /events:
     post:
@@ -258,6 +260,135 @@ paths:
         '404':
           description: Not found
 
+  /reviews:
+    get:
+      tags:
+        - reviews
+      summary: Получение списка рецензий к фильмам пользователя
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Review'
+        '400':
+          description: Invalid request, missing required parameters
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+
+  /reviews/{film_id}:
+    post:
+      tags:
+        - reviews
+      summary: Создание рецензии на фильм
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReviewWrite'
+      parameters:
+        - in: path
+          name: film_id
+          schema:
+            type: string
+            example: cf083ea9-aa9f-4dd0-b8ee-29393c1a0a31
+            default: cf083ea9-aa9f-4dd0-b8ee-29393c1a0a31
+      responses:
+        '201':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Review'
+        '400':
+          description: Invalid request, missing required parameters
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+
+    get:
+      tags:
+        - reviews
+      summary: Получение списка рецензий на фильм
+      parameters:
+        - in: path
+          name: film_id
+          schema:
+            type: string
+            example: cf083ea9-aa9f-4dd0-b8ee-29393c1a0a31
+            default: cf083ea9-aa9f-4dd0-b8ee-29393c1a0a31
+      responses:
+        '201':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Review'
+        '400':
+          description: Invalid request, missing required parameters
+        '404':
+          description: Not found
+      security: []
+
+    patch:
+      tags:
+        - reviews
+      summary: Изменение рецензии на фильм
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReviewWrite'
+      parameters:
+        - in: path
+          name: film_id
+          schema:
+            type: string
+            example: cf083ea9-aa9f-4dd0-b8ee-29393c1a0a31
+            default: cf083ea9-aa9f-4dd0-b8ee-29393c1a0a31
+      responses:
+        '201':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Review'
+        '400':
+          description: Invalid request, missing required parameters
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+
+    delete:
+      tags:
+        - reviews
+      summary: Удаление рецензии на фильм
+      parameters:
+        - in: path
+          name: film_id
+          schema:
+            type: string
+            example: cf083ea9-aa9f-4dd0-b8ee-29393c1a0a31
+            default: cf083ea9-aa9f-4dd0-b8ee-29393c1a0a31
+      responses:
+        '204':
+          description: Successful operation
+        '400':
+          description: Invalid request, missing required parameters
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+
 components:
   securitySchemes:
     cookieAuth: # arbitrary name for the security scheme; will be used in the "security" key later
@@ -335,6 +466,37 @@ components:
         timestamp:
           type: string
           example: Thu, 06 Jun 2024 23:36:32 GMT
+
+    Review:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 666361e25b1b01d7066d8134
+        film_id:
+          type: string
+          example: cf083ea9-aa9f-4dd0-b8ee-29393c1a0a31
+        author:
+          type: string
+          example: bf051197-081c-42ae-9ef3-566f49d58a73
+        text:
+          type: string
+          example: Рецензия к фильму.
+        rating:
+          type: integer
+          example: 5
+        timestamp:
+          type: string
+          example: Fri, 07 Jun 2024 16:58:50 GMT
+
+    ReviewWrite:
+      type: object
+      required:
+        - text
+      properties:
+        text:
+          type: string
+          example: Рецензия к фильму.
 
 security:
   - cookieAuth: []

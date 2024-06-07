@@ -7,10 +7,10 @@ from flask import Blueprint, abort, jsonify, request
 from pydantic import ValidationError
 
 from src.core.config import PREFIX_BASE_ROUTE
+from src.db.repositories import GradeRepository, get_grade_repository
 from src.helpers.check_token import check_access_token
 from src.models.auth import AuthUser
 from src.models.grades import GradeCreate, GradeUpdate
-from src.services.grades import GradeManager, get_grade_manager
 
 routers = Blueprint("grades", __name__, url_prefix=PREFIX_BASE_ROUTE + "/grades")
 
@@ -18,8 +18,8 @@ routers = Blueprint("grades", __name__, url_prefix=PREFIX_BASE_ROUTE + "/grades"
 @routers.route("/", methods=["GET"], strict_slashes=False)
 @check_access_token
 @inject
-def get_all(user: AuthUser, grade_manager: Annotated[GradeManager, Depends(get_grade_manager)]):
-    grades = grade_manager.find_all(user_id=user.id)
+def get_all(user: AuthUser, grade_manager: Annotated[GradeRepository, Depends(get_grade_repository)]):
+    grades = grade_manager.find_all(condition={"user_id": user.id})
 
     return jsonify([grade.model_dump() for grade in grades]), HTTPStatus.OK
 
@@ -27,7 +27,7 @@ def get_all(user: AuthUser, grade_manager: Annotated[GradeManager, Depends(get_g
 @routers.route("/<uuid:film_id>", methods=["POST"], strict_slashes=False)
 @check_access_token
 @inject
-def create(user: AuthUser, film_id: UUID, grade_manager: Annotated[GradeManager, Depends(get_grade_manager)]):
+def create(user: AuthUser, film_id: UUID, grade_manager: Annotated[GradeRepository, Depends(get_grade_repository)]):
     request_data = request.json
     try:
         data_model = GradeCreate(
@@ -45,7 +45,7 @@ def create(user: AuthUser, film_id: UUID, grade_manager: Annotated[GradeManager,
 @routers.route("/<uuid:film_id>", methods=["GET"], strict_slashes=False)
 @check_access_token
 @inject
-def get(user: AuthUser, film_id: UUID, grade_manager: Annotated[GradeManager, Depends(get_grade_manager)]):
+def get(user: AuthUser, film_id: UUID, grade_manager: Annotated[GradeRepository, Depends(get_grade_repository)]):
     grade = grade_manager.find_one({"user_id": user.id, "film_id": str(film_id)})
 
     if grade is None:
@@ -57,7 +57,7 @@ def get(user: AuthUser, film_id: UUID, grade_manager: Annotated[GradeManager, De
 @routers.route("/<uuid:film_id>", methods=["PATCH"], strict_slashes=False)
 @check_access_token
 @inject
-def update(user: AuthUser, film_id: UUID, grade_manager: Annotated[GradeManager, Depends(get_grade_manager)]):
+def update(user: AuthUser, film_id: UUID, grade_manager: Annotated[GradeRepository, Depends(get_grade_repository)]):
     request_data = request.json
     try:
         data_model = GradeUpdate.model_validate(request_data)
@@ -76,7 +76,7 @@ def update(user: AuthUser, film_id: UUID, grade_manager: Annotated[GradeManager,
 @routers.route("/<uuid:film_id>", methods=["DELETE"], strict_slashes=False)
 @check_access_token
 @inject
-def delete(user: AuthUser, film_id: UUID, grade_manager: Annotated[GradeManager, Depends(get_grade_manager)]):
+def delete(user: AuthUser, film_id: UUID, grade_manager: Annotated[GradeRepository, Depends(get_grade_repository)]):
     grade = grade_manager.find_one({"user_id": user.id, "film_id": str(film_id)})
 
     if grade is None:

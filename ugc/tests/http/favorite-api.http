@@ -82,7 +82,7 @@ Cookie: access_token={{valid_access_token}}
 
 
 ### Film not found: check response status is 404
-GET http://127.0.0.1:5000/api/v1/favorites/{{not_found_film_id}}
+GET http://127.0.0.1:5000/api/v1/favorites/{{not_found_uuid}}
 Content-Type: application/json
 Cookie: access_token={{valid_access_token}}
 
@@ -118,7 +118,7 @@ Cookie: access_token={{valid_access_token}}
 
 
 ### Film not found: check response status is 404
-DELETE http://127.0.0.1:5000/api/v1/favorites/{{not_found_film_id}}
+DELETE http://127.0.0.1:5000/api/v1/favorites/{{not_found_uuid}}
 Content-Type: application/json
 Cookie: access_token={{valid_access_token}}
 

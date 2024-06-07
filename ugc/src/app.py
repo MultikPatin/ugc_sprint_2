@@ -8,6 +8,7 @@ from werkzeug.exceptions import HTTPException
 from src.api.v1.events import routers as event_routers
 from src.api.v1.favorites import routers as favorite_routers
 from src.api.v1.grades import routers as grade_routers
+from src.api.v1.reviews import routers as review_routers
 from src.brokers.kafka_init import KafkaInit, get_kafka_init
 from src.core.config import settings
 from src.db.mongo import MongoDBInit, get_mongodb_init
@@ -40,6 +41,7 @@ def create_app():
     flask_app.register_blueprint(event_routers)
     flask_app.register_blueprint(grade_routers)
     flask_app.register_blueprint(favorite_routers)
+    flask_app.register_blueprint(review_routers)
 
     init_kafka()  # type:ignore
 

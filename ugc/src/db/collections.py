@@ -1,5 +1,4 @@
 from datetime import datetime
-from uuid import UUID, uuid4
 
 from bunnet import Document, Indexed
 from pydantic import Field
@@ -29,9 +28,8 @@ class Grade(Document):
 
 
 class Review(Document):
-    id: UUID = Field(default_factory=uuid4)  # type:ignore
     film_id: Indexed(str, unique=False)  # type:ignore
-    author: UUID
+    author: str
     text: str
     rating: int = Field(default=0, ge=0, le=10)
     timestamp: datetime
