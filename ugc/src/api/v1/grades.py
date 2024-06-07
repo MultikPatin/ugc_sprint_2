@@ -15,23 +15,6 @@ from src.services.grades import GradeManager, get_grade_manager
 routers = Blueprint("grades", __name__, url_prefix=PREFIX_BASE_ROUTE + "/grades")
 
 
-@routers.route("/", methods=["POST"], strict_slashes=False)
-@check_access_token
-@inject
-def create(user: AuthUser, grade_manager: Annotated[GradeManager, Depends(get_grade_manager)]):
-    request_data = request.json
-    try:
-        data_model = GradeCreate.model_validate(request_data)
-        data_model.user_id = user.id
-
-        grade = grade_manager.create(data_model.model_dump())
-
-        return jsonify(grade.model_dump()), HTTPStatus.CREATED
-
-    except ValidationError:
-        abort(HTTPStatus.BAD_REQUEST, description="Missing required parameter")
-
-
 @routers.route("/", methods=["GET"], strict_slashes=False)
 @check_access_token
 @inject
@@ -39,6 +22,26 @@ def get_all(user: AuthUser, grade_manager: Annotated[GradeManager, Depends(get_g
     grades = grade_manager.find_all(user_id=user.id)
 
     return jsonify([grade.model_dump() for grade in grades]), HTTPStatus.OK
+
+
+@routers.route("/<uuid:film_id>", methods=["POST"], strict_slashes=False)
+@check_access_token
+@inject
+def create(user: AuthUser, film_id: UUID, grade_manager: Annotated[GradeManager, Depends(get_grade_manager)]):
+    request_data = request.json
+    try:
+        data_model = GradeCreate(
+            user_id=user.id,
+            film_id=str(film_id),
+            rating=request_data.get("rating")
+        )
+
+        grade = grade_manager.create(data_model.model_dump())
+
+        return jsonify(grade.model_dump()), HTTPStatus.CREATED
+
+    except ValidationError:
+        abort(HTTPStatus.BAD_REQUEST, description="Missing required parameter")
 
 
 @routers.route("/<uuid:film_id>", methods=["GET"], strict_slashes=False)

@@ -1,10 +1,9 @@
 ### Create grade film. Send POST request with json body.
-POST http://127.0.0.1:5000/api/v1/grades
+POST http://127.0.0.1:5000/api/v1/grades/{{film_id}}
 Content-Type: application/json
 Cookie: access_token={{valid_access_token}}
 
 {
-  "film_id": "{{film_id}}",
   "rating": 10
 }
 
@@ -16,12 +15,11 @@ Cookie: access_token={{valid_access_token}}
 
 
 ### Without key: check response status is 400
-POST http://127.0.0.1:5000/api/v1/grades
+POST http://127.0.0.1:5000/api/v1/grades/{{film_id}}
 Content-Type: application/json
 Cookie: access_token={{valid_access_token}}
 
 {
-  "film_id": "{{film_id}}",
   "rating": 11
 }
 
@@ -33,13 +31,9 @@ Cookie: access_token={{valid_access_token}}
 
 
 ### Without parameter: check response status is 400
-POST http://127.0.0.1:5000/api/v1/grades
+POST http://127.0.0.1:5000/api/v1/grades/{{film_id}}
 Content-Type: application/json
 Cookie: access_token={{valid_access_token}}
-
-{
-  "film_id": "{{film_id}}"
-}
 
 > {%
     client.test("Request executed successfully", function () {
@@ -49,11 +43,10 @@ Cookie: access_token={{valid_access_token}}
 
 
 ### Without access_token: check response status is 403
-POST http://127.0.0.1:5000/api/v1/grades
+POST http://127.0.0.1:5000/api/v1/grades/{{film_id}}
 Content-Type: application/json
 
 {
-  "film_id": "{{film_id}}",
   "rating": 11
 }
 
@@ -65,12 +58,11 @@ Content-Type: application/json
 
 
 ### Expired access_token: check response status is 403
-POST http://127.0.0.1:5000/api/v1/grades
+POST http://127.0.0.1:5000/api/v1/grades/{{film_id}}
 Content-Type: application/json
 Cookie: access_token={{expired_access_token}}
 
 {
-  "film_id": "{{film_id}}",
   "rating": 11
 }
 
@@ -82,12 +74,11 @@ Cookie: access_token={{expired_access_token}}
 
 
 ### Invalid access_token: check response status is 403
-POST http://127.0.0.1:5000/api/v1/grades
+POST http://127.0.0.1:5000/api/v1/grades/{{film_id}}
 Content-Type: application/json
 Cookie: access_token={{invalid_access_token}}
 
 {
-  "film_id": "{{film_id}}",
   "rating": 11
 }
 
@@ -99,12 +90,11 @@ Cookie: access_token={{invalid_access_token}}
 
 
 ### Validated error access_token data: check response status is 403
-POST http://127.0.0.1:5000/api/v1/grades
+POST http://127.0.0.1:5000/api/v1/grades/{{film_id}}
 Content-Type: application/json
 Cookie: access_token={{user_login_access_token}}
 
 {
-  "film_id": "{{film_id}}",
   "rating": 10
 }
 
