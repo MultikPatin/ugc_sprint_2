@@ -1,16 +1,12 @@
-import json
-from typing import Generator, Any
-
 import backoff
 from kafka import KafkaConsumer
 from kafka import errors as kafka_errors
 
 from src.config import KafkaSettings
-from src.models.events import EventMessage
 
 
-class KafkaExtractor:
-    __consumer: KafkaConsumer
+class KafkaBaseExtractor:
+    _consumer: KafkaConsumer
 
     def __init__(self, config: KafkaSettings):
         self.__config = config
@@ -20,7 +16,7 @@ class KafkaExtractor:
         wait_gen=backoff.expo, exception=kafka_errors.NoBrokersAvailable
     )
     def connect(self):
-        self.__consumer = KafkaConsumer(
+        self._consumer = KafkaConsumer(
             self.__config.topic,
             bootstrap_servers=[f"{self.__config.host}:{self.__config.port}"],
             auto_offset_reset=self.__config.auto_offset_reset,
@@ -33,27 +29,8 @@ class KafkaExtractor:
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
-        if self.__consumer:
-            self.__consumer.close()
-
-    def get_data(self) -> Generator[EventMessage, Any, None]:
-        for message in self.__consumer:
-            mes = message.value.decode("utf-8").replace("'", '"')
-            data = json.loads(mes)
-            service = data.get("service")
-            user = data.get("user")
-            timestamp = data.get("timestamp")
-            entity_type = data.get("entity_type")
-            entity = data.get("entity")
-            action = data.get("action")
-            yield EventMessage(
-                service=service,
-                user=user,
-                timestamp=timestamp,
-                entity_type=entity_type,
-                entity=entity,
-                action=action,
-            )
+        if self._consumer:
+            self._consumer.close()
 
     def commit(self):
-        self.__consumer.commit()
+        self._consumer.commit()
