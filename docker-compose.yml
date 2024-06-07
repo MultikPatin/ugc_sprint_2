@@ -91,6 +91,72 @@ services:
     networks:
       - kafka_network
 
+  etl_analytics_favorites:
+    container_name: etl_analytics_favorites
+    image: etl_analytics:latest
+    build:
+      context: ./etl_analytics/
+      dockerfile: Dockerfile
+    env_file:
+      - ./etl_analytics/.env
+    environment:
+      - KAFKA_HOST=${KAFKA_BROKER_NAME_0}
+      - KAFKA_PORT=${KAFKA_INTERNAL_PORT}
+      - KAFKA_TOPIC=${KAFKA_TOPIC_NAME_2}
+      - CLICKHOUSE_HOST=${CLICKHOUSE_HOST}
+      - CLICKHOUSE_USERNAME=${CLICKHOUSE_USERNAME}
+      - CLICKHOUSE_PASSWORD=${CLICKHOUSE_PASSWORD}
+      - SENTRY_DSN=${SENTRY_DSN}
+    depends_on:
+      kafka-init:
+        condition: service_started
+    networks:
+      - kafka_network
+
+  etl_analytics_grades:
+    container_name: etl_analytics_grades
+    image: etl_analytics:latest
+    build:
+      context: ./etl_analytics/
+      dockerfile: Dockerfile
+    env_file:
+      - ./etl_analytics/.env
+    environment:
+      - KAFKA_HOST=${KAFKA_BROKER_NAME_0}
+      - KAFKA_PORT=${KAFKA_INTERNAL_PORT}
+      - KAFKA_TOPIC=${KAFKA_TOPIC_NAME_3}
+      - CLICKHOUSE_HOST=${CLICKHOUSE_HOST}
+      - CLICKHOUSE_USERNAME=${CLICKHOUSE_USERNAME}
+      - CLICKHOUSE_PASSWORD=${CLICKHOUSE_PASSWORD}
+      - SENTRY_DSN=${SENTRY_DSN}
+    depends_on:
+      kafka-init:
+        condition: service_started
+    networks:
+      - kafka_network
+
+  etl_analytics_reviews:
+    container_name: etl_analytics_reviews
+    image: etl_analytics:latest
+    build:
+      context: ./etl_analytics/
+      dockerfile: Dockerfile
+    env_file:
+      - ./etl_analytics/.env
+    environment:
+      - KAFKA_HOST=${KAFKA_BROKER_NAME_0}
+      - KAFKA_PORT=${KAFKA_INTERNAL_PORT}
+      - KAFKA_TOPIC=${KAFKA_TOPIC_NAME_4}
+      - CLICKHOUSE_HOST=${CLICKHOUSE_HOST}
+      - CLICKHOUSE_USERNAME=${CLICKHOUSE_USERNAME}
+      - CLICKHOUSE_PASSWORD=${CLICKHOUSE_PASSWORD}
+      - SENTRY_DSN=${SENTRY_DSN}
+    depends_on:
+      kafka-init:
+        condition: service_started
+    networks:
+      - kafka_network
+
   kafka-0:
     image: bitnami/kafka:${KAFKA_VERSION}
     container_name: ${KAFKA_BROKER_NAME_0}
@@ -182,6 +248,9 @@ services:
 
       echo -e 'Creating kafka topics'
       kafka-topics.sh --bootstrap-server ${KAFKA_BROKER_NAME_0}:${KAFKA_INTERNAL_PORT} --create --if-not-exists --topic ${KAFKA_TOPIC_NAME_1} --replication-factor ${KAFKA_TOPIC_1_REPLICATION_FACTOR} --partitions ${KAFKA_TOPIC_1_PARTITIONS} --config retention.ms=${KAFKA_TOPIC_1_RETENTIONS_MS}
+      kafka-topics.sh --bootstrap-server ${KAFKA_BROKER_NAME_0}:${KAFKA_INTERNAL_PORT} --create --if-not-exists --topic ${KAFKA_TOPIC_NAME_2} --replication-factor ${KAFKA_TOPIC_2_REPLICATION_FACTOR} --partitions ${KAFKA_TOPIC_2_PARTITIONS} --config retention.ms=${KAFKA_TOPIC_2_RETENTIONS_MS}
+      kafka-topics.sh --bootstrap-server ${KAFKA_BROKER_NAME_0}:${KAFKA_INTERNAL_PORT} --create --if-not-exists --topic ${KAFKA_TOPIC_NAME_3} --replication-factor ${KAFKA_TOPIC_3_REPLICATION_FACTOR} --partitions ${KAFKA_TOPIC_3_PARTITIONS} --config retention.ms=${KAFKA_TOPIC_3_RETENTIONS_MS}
+      kafka-topics.sh --bootstrap-server ${KAFKA_BROKER_NAME_0}:${KAFKA_INTERNAL_PORT} --create --if-not-exists --topic ${KAFKA_TOPIC_NAME_4} --replication-factor ${KAFKA_TOPIC_4_REPLICATION_FACTOR} --partitions ${KAFKA_TOPIC_4_PARTITIONS} --config retention.ms=${KAFKA_TOPIC_4_RETENTIONS_MS}
 
       echo -e 'Successfully created the following topics:'
       kafka-topics.sh --bootstrap-server ${KAFKA_BROKER_NAME_0}:${KAFKA_INTERNAL_PORT} --list
