@@ -32,24 +32,5 @@ class KafkaBaseExtractor:
         if self._consumer:
             self._consumer.close()
 
-    # def get_data(self) -> Generator[EventMessage, Any, None]:
-    #     for message in self.__consumer:
-    #         mes = message.value.decode("utf-8").replace("'", '"')
-    #         data = json.loads(mes)
-    #         service = data.get("service")
-    #         user = data.get("user")
-    #         timestamp = data.get("timestamp")
-    #         entity_type = data.get("entity_type")
-    #         entity = data.get("entity")
-    #         action = data.get("action")
-    #         yield EventMessage(
-    #             service=service,
-    #             user=user,
-    #             timestamp=timestamp,
-    #             entity_type=entity_type,
-    #             entity=entity,
-    #             action=action,
-    #         )
-
     def commit(self):
         self._consumer.commit()

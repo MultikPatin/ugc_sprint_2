@@ -10,11 +10,11 @@ match content_name:
     case "events":
         from src.services.events import KafkaExtractor, ClickHouseLoader
     case "favorites":
-        from src.services.favorites import KafkaExtractor, ClickHouseLoader
+        from src.services.favorites import KafkaExtractor, ClickHouseLoader  # type: ignore
     case "grades":
-        from src.services.grades import KafkaExtractor, ClickHouseLoader
+        from src.services.grades import KafkaExtractor, ClickHouseLoader  # type: ignore
     case "reviews":
-        from src.services.reviews import KafkaExtractor, ClickHouseLoader
+        from src.services.reviews import KafkaExtractor, ClickHouseLoader  # type: ignore
     case _:
         raise ValueError(f"Unknown content name: {content_name}")
 

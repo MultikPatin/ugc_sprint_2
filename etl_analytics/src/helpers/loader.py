@@ -4,7 +4,6 @@ from clickhouse_driver import Client
 from clickhouse_driver import errors as ch_errors
 
 from src.config import ClickHouseSettings
-# from src.models.events import EventMessage
 
 
 class ClickHouseBaseLoader:
@@ -30,19 +29,3 @@ class ClickHouseBaseLoader:
     def __exit__(self, exc_type, exc_value, traceback):
         if self._client:
             self._client.disconnect()
-
-    # def write_data(self, messages: list[EventMessage]):
-    #     self.connect()
-    #     query = "INSERT INTO default.events (service, user, timestamp, entity_type, entity, action) VALUES"
-    #     params = (
-    #         (
-    #             message.service,
-    #             message.user,
-    #             message.timestamp,
-    #             message.entity_type,
-    #             message.entity,
-    #             message.action,
-    #         )
-    #         for message in messages
-    #     )
-    #     self._client.execute(query=query, params=params)
