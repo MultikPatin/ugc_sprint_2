@@ -42,5 +42,5 @@ class GradeManager:
 
 
 @inject
-def get_grade_manager(client: Annotated[MongoClient, Depends(get_mongo_client)]):
+def get_grade_manager(client: Annotated[MongoClient, Depends(get_mongo_client)]) -> GradeManager:
     return GradeManager(client=client)

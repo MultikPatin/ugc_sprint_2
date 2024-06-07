@@ -1,0 +1,129 @@
+### Create favorite film. Send POST request.
+POST http://127.0.0.1:5000/api/v1/favorites/{{film_id}}
+Content-Type: application/json
+Cookie: access_token={{valid_access_token}}
+
+> {%
+    client.test("Request executed successfully", function () {
+        client.assert(response.status === 201, "Response status is not 201");
+    });
+%}
+
+
+### Without key: check response status is 404
+POST http://127.0.0.1:5000/api/v1/favorites
+Content-Type: application/json
+Cookie: access_token={{valid_access_token}}
+
+> {%
+    client.test("Request executed successfully", function () {
+        client.assert(response.status === 404, "Response status is not 404");
+    });
+%}
+
+
+### Without access_token: check response status is 403
+POST http://127.0.0.1:5000/api/v1/favorites/{{film_id}}
+Content-Type: application/json
+
+> {%
+    client.test("Request executed successfully", function () {
+        client.assert(response.status === 403, "Response status is not 403");
+    });
+%}
+
+
+### Expired access_token: check response status is 403
+POST http://127.0.0.1:5000/api/v1/favorites/{{film_id}}
+Content-Type: application/json
+Cookie: access_token={{expired_access_token}}
+
+> {%
+    client.test("Request executed successfully", function () {
+        client.assert(response.status === 403, "Response status is not 403");
+    });
+%}
+
+
+### Invalid access_token: check response status is 403
+POST http://127.0.0.1:5000/api/v1/favorites/{{film_id}}
+Content-Type: application/json
+Cookie: access_token={{invalid_access_token}}
+
+> {%
+    client.test("Request executed successfully", function () {
+        client.assert(response.status === 403, "Response status is not 403");
+    });
+%}
+
+
+### Validated error access_token data: check response status is 403
+POST http://127.0.0.1:5000/api/v1/favorites/{{film_id}}
+Content-Type: application/json
+Cookie: access_token={{user_login_access_token}}
+
+> {%
+    client.test("Request executed successfully", function () {
+        client.assert(response.status === 403, "Response status is not 403");
+    });
+%}
+
+
+### Get favorite by film. Send GET request
+GET http://127.0.0.1:5000/api/v1/favorites/{{film_id}}
+Content-Type: application/json
+Cookie: access_token={{valid_access_token}}
+
+> {%
+    client.test("Request executed successfully", function () {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+%}
+
+
+### Film not found: check response status is 404
+GET http://127.0.0.1:5000/api/v1/favorites/{{not_found_film_id}}
+Content-Type: application/json
+Cookie: access_token={{valid_access_token}}
+
+> {%
+    client.test("Request executed successfully", function () {
+        client.assert(response.status === 404, "Response status is not 404");
+    });
+%}
+
+
+### Get list favorites by user. Send GET request
+GET http://127.0.0.1:5000/api/v1/favorites
+Content-Type: application/json
+Cookie: access_token={{valid_access_token}}
+
+> {%
+    client.test("Request executed successfully", function () {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+%}
+
+
+### Delete favorite by film. Send DELETE request with json body
+DELETE http://127.0.0.1:5000/api/v1/favorites/{{film_id}}
+Content-Type: application/json
+Cookie: access_token={{valid_access_token}}
+
+> {%
+    client.test("Request executed successfully", function () {
+        client.assert(response.status === 204, "Response status is not 204");
+    });
+%}
+
+
+### Film not found: check response status is 404
+DELETE http://127.0.0.1:5000/api/v1/favorites/{{not_found_film_id}}
+Content-Type: application/json
+Cookie: access_token={{valid_access_token}}
+
+> {%
+    client.test("Request executed successfully", function () {
+        client.assert(response.status === 404, "Response status is not 404");
+    });
+%}

@@ -7,9 +7,11 @@ servers:
   - url: '/api/v1'
 tags:
   - name: events
-    description: "Event data for analysis users actions"
+    description: "Пользовательские события"
   - name: grades
     description: "Оценка пользователя к фильму"
+  - name: favorites
+    description: "Закладки пользователя, избранные фильмы"
 paths:
   /events:
     post:
@@ -42,7 +44,7 @@ paths:
         - grades
       summary: Получение списка оценок к фильмам пользователя
       responses:
-        '201':
+        '200':
           description: Successful operation
           content:
             application/json:
@@ -83,6 +85,8 @@ paths:
           description: Invalid request, missing required parameters
         '403':
           description: Forbidden
+        '404':
+          description: Not found
 
     get:
       tags:
@@ -106,6 +110,8 @@ paths:
           description: Invalid request, missing required parameters
         '403':
           description: Forbidden
+        '404':
+          description: Not found
 
     patch:
       tags:
@@ -135,6 +141,8 @@ paths:
           description: Invalid request, missing required parameters
         '403':
           description: Forbidden
+        '404':
+          description: Not found
 
     delete:
       tags:
@@ -154,6 +162,101 @@ paths:
           description: Invalid request, missing required parameters
         '403':
           description: Forbidden
+        '404':
+          description: Not found
+
+  /favorites:
+    get:
+      tags:
+        - favorites
+      summary: Получение списка фильмов в избранном пользователя
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Favorite'
+        '400':
+          description: Invalid request, missing required parameters
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+
+  /favorites/{film_id}:
+    post:
+      tags:
+        - favorites
+      summary: Добавление фильма в избранное пользователем
+      parameters:
+        - in: path
+          name: film_id
+          schema:
+            type: string
+            example: cf083ea9-aa9f-4dd0-b8ee-29393c1a0a31
+            default: cf083ea9-aa9f-4dd0-b8ee-29393c1a0a31
+      responses:
+        '201':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Favorite'
+        '400':
+          description: Invalid request, missing required parameters
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+
+    get:
+      tags:
+        - favorites
+      summary: Получение фильма в избранном пользователя
+      parameters:
+        - in: path
+          name: film_id
+          schema:
+            type: string
+            example: cf083ea9-aa9f-4dd0-b8ee-29393c1a0a31
+            default: cf083ea9-aa9f-4dd0-b8ee-29393c1a0a31
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Favorite'
+        '400':
+          description: Invalid request, missing required parameters
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+
+    delete:
+      tags:
+        - favorites
+      summary: Удаление фильма из избранного пользователем
+      parameters:
+        - in: path
+          name: film_id
+          schema:
+            type: string
+            example: cf083ea9-aa9f-4dd0-b8ee-29393c1a0a31
+            default: cf083ea9-aa9f-4dd0-b8ee-29393c1a0a31
+      responses:
+        '204':
+          description: Successful operation
+        '400':
+          description: Invalid request, missing required parameters
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
 
 components:
   securitySchemes:
@@ -216,6 +319,22 @@ components:
           type: integer
           format: int32
           example: 10
+
+    Favorite:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 66624800d89be65ed7202397
+        film_id:
+          type: string
+          example: cf083ea9-aa9f-4dd0-b8ee-29393c1a0a31
+        user_id:
+          type: string
+          example: bf051197-081c-42ae-9ef3-566f49d58a73
+        timestamp:
+          type: string
+          example: Thu, 06 Jun 2024 23:36:32 GMT
 
 security:
   - cookieAuth: []

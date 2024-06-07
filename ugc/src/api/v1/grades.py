@@ -31,9 +31,7 @@ def create(user: AuthUser, film_id: UUID, grade_manager: Annotated[GradeManager,
     request_data = request.json
     try:
         data_model = GradeCreate(
-            user_id=user.id,
-            film_id=str(film_id),
-            rating=request_data.get("rating")
+            user_id=user.id, film_id=str(film_id), rating=request_data.get("rating") if request_data else None
         )
 
         grade = grade_manager.create(data_model.model_dump())

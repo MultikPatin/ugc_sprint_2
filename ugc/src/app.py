@@ -6,6 +6,7 @@ from flask_swagger_ui import get_swaggerui_blueprint
 from werkzeug.exceptions import HTTPException
 
 from src.api.v1.events import routers as event_routers
+from src.api.v1.favorites import routers as favorite_routers
 from src.api.v1.grades import routers as grade_routers
 from src.brokers.kafka_init import KafkaInit, get_kafka_init
 from src.core.config import settings
@@ -38,6 +39,7 @@ def create_app():
     flask_app.register_blueprint(swagger_blueprint)
     flask_app.register_blueprint(event_routers)
     flask_app.register_blueprint(grade_routers)
+    flask_app.register_blueprint(favorite_routers)
 
     init_kafka()  # type:ignore
 

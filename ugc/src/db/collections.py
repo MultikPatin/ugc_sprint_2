@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import datetime
 from uuid import UUID, uuid4
 
 from bunnet import Document, Indexed
@@ -18,9 +18,9 @@ class Favorite(Document):
 
 class Grade(Document):
     user_id: str
-    film_id: str
+    film_id: Indexed(str, unique=False)  # type:ignore
     rating: int
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    timestamp: datetime
 
     class Settings:
         name = "grades"
