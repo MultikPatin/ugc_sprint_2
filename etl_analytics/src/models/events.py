@@ -1,13 +1,11 @@
-from uuid import UUID
 from dataclasses import dataclass
-from datetime import datetime
+
+from src.models.base import BaseMessage
 
 
 @dataclass(frozen=True)
-class EventMessage:
+class EventMessage(BaseMessage):
     service: str
-    user: UUID
-    timestamp: datetime
     entity_type: str
     entity: str
     action: str

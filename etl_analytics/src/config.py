@@ -19,8 +19,8 @@ class KafkaSettings(EnvSettings):
     host: str = Field(..., alias="KAFKA_HOST")
     port: int = Field(..., alias="KAFKA_PORT")
     topic: str = Field(..., alias="KAFKA_TOPIC")
-    batch_size: int = Field(..., alias="BATCH_SIZE")
-    consumer_timeout: int = Field(..., alias="CONSUMER_TIMEOUT")
+    batch_size: int = Field(..., alias="ETL_ANALYTICS_BATCH_SIZE")
+    consumer_timeout: int = Field(..., alias="ETL_ANALYTICS_CONSUMER_TIMEOUT")
     auto_offset_reset: str = "earliest"
     group_id: str = "echo-messages-to-stdout"
     enable_auto_commit: bool = False
@@ -33,7 +33,7 @@ class ClickHouseSettings(EnvSettings):
 
 
 class AppSettings(EnvSettings):
-    sleep_time: int = Field(..., alias="SLEEP_TIME")
+    sleep_time: int = Field(..., alias="ETL_ANALYTICS_SLEEP_TIME")
 
 
 class Settings(BaseSettings):
