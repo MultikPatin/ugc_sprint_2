@@ -264,6 +264,7 @@ services:
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./nginx/configs:/etc/nginx/conf.d:ro
+      - ./tmp/logs/nginx/:/var/log/nginx/
       - static:/staticfiles/
     restart: unless-stopped
     depends_on:
@@ -276,6 +277,19 @@ services:
       - "80:80"
     networks:
       - kafka_network
+
+  filebeat:
+    build:
+      context: filebeat
+    container_name: filebeat
+    volumes:
+      - ./deploy/filebeat.yml:/usr/share/filebeat/filebeat.yml
+      - ./tmp/logs/nginx:/var/log/nginx:ro
+    depends_on:
+      nginx:
+        condition: service_started
+    links:
+      - logstash
 
 volumes:
   kafka_0_data:

@@ -34,7 +34,9 @@ def create_app():
 
     flask_app.logger.setLevel(logging.DEBUG)
 
-    logstash_handler = logstash.LogstashHandler(settings.logstash.host, settings.logstash.port, version=1)
+    logstash_handler = logstash.LogstashHandler(
+        settings.logstash.host, settings.logstash.port, version=1, tags=["ugc"]
+    )
 
     app.logger.addFilter(RequestIdFilter())
     app.logger.addHandler(logstash_handler)
