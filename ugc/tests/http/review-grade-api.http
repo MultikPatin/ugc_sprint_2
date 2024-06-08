@@ -1,0 +1,42 @@
+### Create review by film. Send POST request.
+POST http://127.0.0.1:5000/api/v1/reviews/{{film_id}}
+Content-Type: application/json
+Cookie: access_token={{valid_access_token}}
+
+{
+  "text": "Рецензия к фильму."
+}
+
+> {% client.global.set("review_id", response.body.id); %}
+
+
+### Create grade by review. Send POST request.
+POST http://127.0.0.1:5000/api/v1/reviews/{{review_id}}/grade
+Content-Type: application/json
+Cookie: access_token={{another_valid_access_token}}
+
+{
+  "rating": 10
+}
+
+> {%
+    client.test("Request executed successfully", function () {
+        client.assert(response.status === 201, "Response status is not 201");
+    });
+%}
+
+
+### Create author grade by review: check response status is 400.
+POST http://127.0.0.1:5000/api/v1/reviews/{{review_id}}/grade
+Content-Type: application/json
+Cookie: access_token={{valid_access_token}}
+
+{
+  "rating": 10
+}
+
+> {%
+    client.test("Request executed successfully", function () {
+        client.assert(response.status === 400, "Response status is not 400");
+    });
+%}

@@ -2,7 +2,7 @@ from bunnet import init_bunnet
 from pymongo import MongoClient
 
 from src.core.config import settings
-from src.db.collections import Favorite, Grade, Review
+from src.db.collections import Favorite, FilmGrade, Review, ReviewGrade
 
 
 def get_mongo_client() -> MongoClient:
@@ -14,7 +14,7 @@ class MongoDBInit:
         self.client = mongodb_client
 
     def create_collections(self) -> None:
-        init_bunnet(database=self.client.ugc, document_models=[Grade, Review, Favorite])  # type:ignore
+        init_bunnet(database=self.client.ugc, document_models=[Review, FilmGrade, ReviewGrade, Favorite])  # type:ignore
 
 
 def get_mongodb_init() -> MongoDBInit:

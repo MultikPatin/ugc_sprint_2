@@ -5,7 +5,7 @@ from kafka.admin import KafkaAdminClient, NewTopic
 
 from src.core.config import settings
 
-TOPIC_LIST: list[str] = ["events"]
+TOPIC_LIST: list[str] = ["events", "grades", "favorites", "reviews"]
 
 topic_config: dict[str, Any] = {
     "num_partitions": 3,

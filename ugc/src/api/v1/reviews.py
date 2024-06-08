@@ -7,10 +7,16 @@ from flask import Blueprint, abort, jsonify, request
 from pydantic import ValidationError
 
 from src.core.config import PREFIX_BASE_ROUTE
-from src.db.repositories import ReviewRepository, get_review_repository
+from src.db.repositories import (
+    ReviewGradeRepository,
+    ReviewRepository,
+    get_review_grade_repository,
+    get_review_repository,
+)
 from src.helpers.check_token import check_access_token
 from src.models.auth import AuthUser
-from src.models.reviews import ReviewModel, ReviewUpdate
+from src.models.grades import GradeReviewCreate
+from src.models.reviews import ReviewCreate, ReviewUpdate
 
 routers = Blueprint("reviews", __name__, url_prefix=PREFIX_BASE_ROUTE + "/reviews")
 
@@ -19,6 +25,7 @@ routers = Blueprint("reviews", __name__, url_prefix=PREFIX_BASE_ROUTE + "/review
 @check_access_token
 @inject
 def get_all(user: AuthUser, repository: Annotated[ReviewRepository, Depends(get_review_repository)]):
+    """Просмотр списка рецензий к фильмам пользователя."""
     reviews = repository.find_all({"author": user.id})
 
     return jsonify([review.model_dump() for review in reviews]), HTTPStatus.OK
@@ -28,13 +35,16 @@ def get_all(user: AuthUser, repository: Annotated[ReviewRepository, Depends(get_
 @check_access_token
 @inject
 def create(user: AuthUser, film_id: UUID, repository: Annotated[ReviewRepository, Depends(get_review_repository)]):
+    """Добавление рецензии к фильму пользователем."""
     request_data = request.json
     try:
-        data_model = ReviewModel(
+        data_model = ReviewCreate(
             film_id=str(film_id), author=user.id, text=request_data.get("text") if request_data else None
         )
 
-        favorite = repository.create(data_model.model_dump())
+        favorite = repository.find_one({"author": data_model.author, "film_id": data_model.film_id})
+        if favorite is None:
+            favorite = repository.create(data_model.model_dump())
 
         return jsonify(favorite.model_dump()), HTTPStatus.CREATED
 
@@ -45,6 +55,7 @@ def create(user: AuthUser, film_id: UUID, repository: Annotated[ReviewRepository
 @routers.route("/<uuid:film_id>", methods=["GET"], strict_slashes=False)
 @inject
 def get(film_id: UUID, repository: Annotated[ReviewRepository, Depends(get_review_repository)]):
+    """Просмотр рецензии к фильму."""
     reviews = repository.find_all({"film_id": str(film_id)})
 
     return jsonify([review.model_dump() for review in reviews]), HTTPStatus.OK
@@ -54,6 +65,7 @@ def get(film_id: UUID, repository: Annotated[ReviewRepository, Depends(get_revie
 @check_access_token
 @inject
 def update(user: AuthUser, film_id: UUID, repository: Annotated[ReviewRepository, Depends(get_review_repository)]):
+    """Обновление рецензии к фильму пользователем."""
     request_data = request.json
     try:
         data_model = ReviewUpdate.model_validate(request_data)
@@ -74,6 +86,7 @@ def update(user: AuthUser, film_id: UUID, repository: Annotated[ReviewRepository
 @check_access_token
 @inject
 def delete(user: AuthUser, film_id: UUID, repository: Annotated[ReviewRepository, Depends(get_review_repository)]):
+    """Удаление рецензии к фильму пользователем."""
     review = repository.find_one({"author": user.id, "film_id": str(film_id)})
 
     if review is None:
@@ -82,3 +95,37 @@ def delete(user: AuthUser, film_id: UUID, repository: Annotated[ReviewRepository
     repository.delete(review)
 
     return jsonify({}), HTTPStatus.NO_CONTENT
+
+
+@routers.route("/<uuid:review_id>/grade", methods=["POST"], strict_slashes=False)
+@check_access_token
+@inject
+def create_grade(
+    user: AuthUser,
+    review_id: UUID,
+    review_repository: Annotated[ReviewRepository, Depends(get_review_repository)],
+    review_grade_repository: Annotated[ReviewGradeRepository, Depends(get_review_grade_repository)],
+):
+    """Добавление оценки к рецензии пользователем"""
+    request_data = request.json
+
+    review = review_repository.get(review_id)
+    if review is None:
+        abort(HTTPStatus.NOT_FOUND, description="Review not found")
+
+    if review.author == user.id:
+        abort(HTTPStatus.BAD_REQUEST, description="You cannot add a rating to your review.")
+
+    try:
+        data_model = GradeReviewCreate(
+            user_id=user.id, review_id=str(review_id), rating=request_data.get("rating") if request_data else None
+        )
+
+        grade = review_grade_repository.find_one({"user_id": data_model.user_id, "review_id": data_model.review_id})
+        if grade is None:
+            grade = review_grade_repository.create(data_model.model_dump())
+
+        return jsonify(grade.model_dump()), HTTPStatus.CREATED
+
+    except ValidationError:
+        abort(HTTPStatus.BAD_REQUEST, description="Missing required parameter")

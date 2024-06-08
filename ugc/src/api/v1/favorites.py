@@ -10,7 +10,7 @@ from src.core.config import PREFIX_BASE_ROUTE
 from src.db.repositories import FavoriteRepository, get_favorite_repository
 from src.helpers.check_token import check_access_token
 from src.models.auth import AuthUser
-from src.models.favorites import FavoriteModel
+from src.models.favorites import FavoriteCreate
 
 routers = Blueprint("favorites", __name__, url_prefix=PREFIX_BASE_ROUTE + "/favorites")
 
@@ -29,12 +29,14 @@ def get_all(user: AuthUser, repository: Annotated[FavoriteRepository, Depends(ge
 @inject
 def create(user: AuthUser, film_id: UUID, repository: Annotated[FavoriteRepository, Depends(get_favorite_repository)]):
     try:
-        data_model = FavoriteModel(
+        data_model = FavoriteCreate(
             user_id=user.id,
             film_id=str(film_id),
         )
 
-        favorite = repository.create(data_model.model_dump())
+        favorite = repository.find_one({"user_id": data_model.user_id, "film_id": data_model.film_id})
+        if favorite is None:
+            favorite = repository.create(data_model.model_dump())
 
         return jsonify(favorite.model_dump()), HTTPStatus.CREATED
 
