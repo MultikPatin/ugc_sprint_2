@@ -46,7 +46,7 @@ class KafkaSettings(EnvSettings):
 
 
 class MongoDBSettings(EnvSettings):
-    mongodb_uri: str = Field(default="mongodb://localhost:27017")
+    mongo_db_uri: str = Field(default="mongodb://localhost:27017")
     mongo_db_name: str = Field(default="ugc")
 
 

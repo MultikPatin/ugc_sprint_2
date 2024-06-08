@@ -6,7 +6,7 @@ from src.db.collections import Favorite, FilmGrade, Review, ReviewGrade
 
 
 def get_mongo_client() -> MongoClient:
-    return MongoClient(str(settings.mongodb.mongodb_uri))
+    return MongoClient(str(settings.mongodb.mongo_db_uri))
 
 
 class MongoDBInit:
