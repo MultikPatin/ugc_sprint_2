@@ -1,5 +1,6 @@
 import logging
 import time
+import sentry_sdk
 
 from src.utils.logger import create_logger
 from src.config import settings
@@ -42,6 +43,11 @@ def etl(
 
 
 if __name__ == "__main__":
+    sentry_sdk.init(
+        dsn=settings.sentry.dsn,
+        traces_sample_rate=1.0,
+        profiles_sample_rate=1.0,
+    )
     logger = create_logger(f"ETL analytics {content_name.upper()}")
     with (
         KafkaExtractor(settings.kafka) as kafka,
