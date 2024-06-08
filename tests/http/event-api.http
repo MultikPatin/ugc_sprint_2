@@ -1,0 +1,115 @@
+### Send POST request with json body
+POST http://127.0.0.1:5000/api/v1/events?key=test_event
+Content-Type: application/json
+Cookie: access_token={{valid_access_token}}
+
+{
+  "entity_type": "String",
+  "entity": "String",
+  "action": "String"
+}
+
+> {%
+    client.test("Request executed successfully", function () {
+        client.assert(response.status === 202, "Response status is not 202");
+    });
+%}
+
+### Without key: check response status is 400
+POST http://127.0.0.1:5000/api/v1/events
+Content-Type: application/json
+Cookie: access_token={{valid_access_token}}
+
+{
+  "entity_type": "String",
+  "entity": "String",
+  "action": "String"
+}
+
+> {%
+    client.test("Request executed successfully", function () {
+        client.assert(response.status === 400, "Response status is not 400");
+    });
+%}
+
+### Without parameter: check response status is 400
+POST http://127.0.0.1:5000/api/v1/events?key=test_event
+Content-Type: application/json
+Cookie: access_token={{valid_access_token}}
+
+{
+  "action": "String"
+}
+
+> {%
+    client.test("Request executed successfully", function () {
+        client.assert(response.status === 400, "Response status is not 400");
+    });
+%}
+
+### Without access_token: check response status is 403
+POST http://127.0.0.1:5000/api/v1/events?key=test_event
+Content-Type: application/json
+
+{
+  "entity_type": "String",
+  "entity": "String",
+  "action": "String"
+}
+
+> {%
+    client.test("Request executed successfully", function () {
+        client.assert(response.status === 403, "Response status is not 403");
+    });
+%}
+
+### Expired access_token: check response status is 403
+POST http://127.0.0.1:5000/api/v1/events?key=test_event
+Content-Type: application/json
+Cookie: access_token={{expired_access_token}}
+
+{
+  "entity_type": "String",
+  "entity": "String",
+  "action": "String"
+}
+
+> {%
+    client.test("Request executed successfully", function () {
+        client.assert(response.status === 403, "Response status is not 403");
+    });
+%}
+
+### Invalid access_token: check response status is 403
+POST http://127.0.0.1:5000/api/v1/events?key=test_event
+Content-Type: application/json
+Cookie: access_token={{invalid_access_token}}
+
+{
+  "entity_type": "String",
+  "entity": "String",
+  "action": "String"
+}
+
+> {%
+    client.test("Request executed successfully", function () {
+        client.assert(response.status === 403, "Response status is not 403");
+    });
+%}
+
+### Validated error access_token data: check response status is 403
+POST http://127.0.0.1:5000/api/v1/events?key=test_event
+Content-Type: application/json
+Cookie: access_token={{user_login_access_token}}
+
+{
+  "entity_type": "String",
+  "entity": "String",
+  "action": "String"
+}
+
+> {%
+    client.test("Request executed successfully", function () {
+        client.assert(response.status === 403, "Response status is not 403");
+    });
+%}
