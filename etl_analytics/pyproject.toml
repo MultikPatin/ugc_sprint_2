@@ -11,13 +11,13 @@ pydantic-settings = "^2.2.1"
 backoff = "^2.2.1"
 kafka-python = "^2.0.2"
 clickhouse-driver = "^0.2.7"
+sentry-sdk = "^2.4.0"
 
 [tool.poetry.group.dev]
 optional = true
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.4.4"
-pre-commit = "^3.6.2"
 mypy = "^1.10.0"
 
 [build-system]

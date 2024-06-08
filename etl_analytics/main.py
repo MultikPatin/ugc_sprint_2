@@ -1,10 +1,23 @@
 import logging
 import time
+import sentry_sdk
 
 from src.utils.logger import create_logger
 from src.config import settings
-from src.helpers.extractor import KafkaExtractor
-from src.helpers.loader import ClickHouseLoader
+
+content_name = settings.kafka.topic
+
+match content_name:
+    case "events":
+        from src.services.events import KafkaExtractor, ClickHouseLoader
+    case "favorites":
+        from src.services.favorites import KafkaExtractor, ClickHouseLoader  # type: ignore
+    case "grades":
+        from src.services.grades import KafkaExtractor, ClickHouseLoader  # type: ignore
+    case "reviews":
+        from src.services.reviews import KafkaExtractor, ClickHouseLoader  # type: ignore
+    case _:
+        raise ValueError(f"Unknown content name: {content_name}")
 
 
 def etl(
@@ -30,10 +43,15 @@ def etl(
 
 
 if __name__ == "__main__":
-    logger = create_logger("ETL analytics Main")
+    sentry_sdk.init(
+        dsn=settings.sentry.dsn,
+        traces_sample_rate=1.0,
+        profiles_sample_rate=1.0,
+    )
+    logger = create_logger(f"ETL analytics {content_name.upper()}")
     with (
         KafkaExtractor(settings.kafka) as kafka,
         ClickHouseLoader(settings.clickHouse) as clickhouse,
     ):
-        logger.info("START ETL analytics Main")
+        logger.info(f"START ETL analytics {content_name.upper()}")
         etl(logger, kafka, clickhouse)
