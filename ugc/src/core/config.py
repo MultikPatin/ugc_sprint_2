@@ -20,12 +20,12 @@ class AppSettings(EnvSettings):
 
 
 class SentrySettings(EnvSettings):
-    dsn: str = Field(..., alias="SENTRY_DSN")
+    sentry_dsn: str = Field(default="https://exemple")
 
 
 class LogstashSettings(EnvSettings):
-    host: str = Field(..., alias="LOGSTASH_HOST")
-    port: int = Field(..., alias="LOGSTASH_PORT")
+    logstash_host: str = Field(default="logstash")
+    logstash_port: int = Field(default=5044)
 
 
 class SwaggerSettings(EnvSettings):

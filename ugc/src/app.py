@@ -1,11 +1,9 @@
+import logging
 from typing import Annotated
 
-from fast_depends import Depends, inject
-from flask import Flask, jsonify
-import logging
-
 import logstash
-from flask import Flask, request
+from fast_depends import Depends, inject
+from flask import Flask, jsonify, request
 from flask_swagger_ui import get_swaggerui_blueprint
 from werkzeug.exceptions import HTTPException
 
@@ -23,6 +21,14 @@ swagger_blueprint = get_swaggerui_blueprint(
     config={
         "app_name": settings.swagger.project_name,
     },
+)
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+logger.addHandler(logging.StreamHandler())
+
+logstash_handler = logstash.LogstashHandler(
+    settings.logstash.logstash_host, settings.logstash.logstash_port, version=1, tags=["ugc"]
 )
 
 
@@ -45,19 +51,6 @@ def init_mongodb(mongodb_init_app: Annotated[MongoDBInit, Depends(get_mongodb_in
 def create_app():
     flask_app = Flask(__name__)
 
-    flask_app.logger = logging.getLogger(__name__)
-
-    flask_app.logger.setLevel(logging.DEBUG)
-
-    logstash_handler = logstash.LogstashHandler(
-        settings.logstash.host, settings.logstash.port, version=1, tags=["ugc"]
-    )
-
-    app.logger.addFilter(RequestIdFilter())
-    app.logger.addHandler(logstash_handler)
-
-    flask_app.logger.addHandler(logging.StreamHandler())
-
     init_mongodb()  # type:ignore
 
     flask_app.register_blueprint(swagger_blueprint)
@@ -72,6 +65,9 @@ def create_app():
 
 
 app = create_app()
+
+app.logger.addFilter(RequestIdFilter())
+app.logger.addHandler(logstash_handler)
 
 
 @app.errorhandler(HTTPException)
