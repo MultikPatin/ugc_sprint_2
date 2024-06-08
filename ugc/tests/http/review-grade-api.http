@@ -1,4 +1,4 @@
-### Create review by film. Send POST request.
+### Create review film. Send POST request.
 POST http://127.0.0.1:5000/api/v1/reviews/{{film_id}}
 Content-Type: application/json
 Cookie: access_token={{valid_access_token}}
@@ -10,7 +10,7 @@ Cookie: access_token={{valid_access_token}}
 > {% client.global.set("review_id", response.body.id); %}
 
 
-### Create grade by review. Send POST request.
+### Create grade review. Send POST request.
 POST http://127.0.0.1:5000/api/v1/reviews/{{review_id}}/grade
 Content-Type: application/json
 Cookie: access_token={{another_valid_access_token}}
@@ -26,7 +26,7 @@ Cookie: access_token={{another_valid_access_token}}
 %}
 
 
-### Create author grade by review: check response status is 400.
+### Create author grade review: check response status is 400.
 POST http://127.0.0.1:5000/api/v1/reviews/{{review_id}}/grade
 Content-Type: application/json
 Cookie: access_token={{valid_access_token}}
@@ -38,5 +38,33 @@ Cookie: access_token={{valid_access_token}}
 > {%
     client.test("Request executed successfully", function () {
         client.assert(response.status === 400, "Response status is not 400");
+    });
+%}
+
+
+### Update grade review. Send POST request.
+PATCH http://127.0.0.1:5000/api/v1/reviews/{{review_id}}/grade
+Content-Type: application/json
+Cookie: access_token={{another_valid_access_token}}
+
+{
+  "rating": 6
+}
+
+> {%
+    client.test("Request executed successfully", function () {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+%}
+
+
+### Delete grade review. Send DELETE request
+DELETE http://127.0.0.1:5000/api/v1/reviews/{{review_id}}/grade
+Content-Type: application/json
+Cookie: access_token={{another_valid_access_token}}
+
+> {%
+    client.test("Request executed successfully", function () {
+        client.assert(response.status === 204, "Response status is not 204");
     });
 %}

@@ -290,7 +290,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ReviewWrite'
+              $ref: '#/components/schemas/ReviewCreate'
       parameters:
         - in: path
           name: film_id
@@ -346,7 +346,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ReviewWrite'
+              $ref: '#/components/schemas/ReviewCreate'
       parameters:
         - in: path
           name: film_id
@@ -595,7 +595,7 @@ components:
           type: string
           example: Fri, 07 Jun 2024 16:58:50 GMT
 
-    ReviewWrite:
+    ReviewCreate:
       type: object
       required:
         - text

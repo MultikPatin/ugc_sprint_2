@@ -15,7 +15,7 @@ from src.db.repositories import (
 )
 from src.helpers.check_token import check_access_token
 from src.models.auth import AuthUser
-from src.models.grades import GradeReviewCreate
+from src.models.grades import GradeReviewCreate, GradeUpdate
 from src.models.reviews import ReviewCreate, ReviewUpdate
 
 routers = Blueprint("reviews", __name__, url_prefix=PREFIX_BASE_ROUTE + "/reviews")
@@ -129,3 +129,48 @@ def create_grade(
 
     except ValidationError:
         abort(HTTPStatus.BAD_REQUEST, description="Missing required parameter")
+
+
+@routers.route("/<uuid:review_id>/grade", methods=["PATCH"], strict_slashes=False)
+@check_access_token
+@inject
+def update_grade(
+    user: AuthUser,
+    review_id: UUID,
+    repository: Annotated[ReviewGradeRepository, Depends(get_review_grade_repository)],
+):
+    """Обновление оценки к рецензии пользователем"""
+    request_data = request.json
+
+    try:
+        data_model = GradeUpdate.model_validate(request_data)
+
+        grade_exist = repository.find_one({"user_id": user.id, "review_id": str(review_id)})
+        if grade_exist is None:
+            abort(HTTPStatus.NOT_FOUND, description="Review not found")
+
+        grade = repository.update(grade_exist, data_model.rating)
+
+        return jsonify(grade.model_dump()), HTTPStatus.OK
+
+    except ValidationError:
+        abort(HTTPStatus.BAD_REQUEST, description="Missing required parameter")
+
+
+@routers.route("/<uuid:review_id>/grade", methods=["DELETE"], strict_slashes=False)
+@check_access_token
+@inject
+def delete_grade(
+    user: AuthUser,
+    review_id: UUID,
+    repository: Annotated[ReviewGradeRepository, Depends(get_review_grade_repository)],
+):
+    """Удаление оценки к рецензии пользователем"""
+    grade = repository.find_one({"user_id": user.id, "review_id": str(review_id)})
+
+    if grade is None:
+        abort(HTTPStatus.NOT_FOUND, description="Film not found")
+
+    repository.delete(grade)
+
+    return jsonify({}), HTTPStatus.NO_CONTENT
