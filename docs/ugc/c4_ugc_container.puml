@@ -1,0 +1,38 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+skinparam wrapWidth 300
+'LAYOUT_WITH_LEGEND()
+LAYOUT_LANDSCAPE()
+
+header %date("dd MMMM YYYY")
+title UGC service
+
+Person(user, "Пользователь", "Авторизованный")
+Person_Ext(analyst, "Аналитик", "Аналитик")
+
+System_Ext(movies, "Movies UI", "Пользовательский интерфейс")
+SystemDb_Ext(ch, "ClickHouse", "Внешнее хранилище для сбора аналитических данных")
+
+System_Boundary(ugc, "UGC") {
+  ContainerDb(mongo, "MongoDB", "", "")
+  Container(api, "API", "python 3.11, Flask", "API лайков, рецензий, закладок")
+  Container(api_events, "API events", "python 3.11, Flask", "API пользовательских событий")
+  Container(etl_events, "ETL", "python 3.11", "ETL пользовательских событий")
+  SystemQueue(broker, "Kafka", "Пользовательские события")
+
+  Rel(api, mongo, "Сохраняет", "")
+  Rel(api, broker, "Сохраняет", "")
+  Rel(api_events, broker, "Сохраняет", "")
+  Rel(etl_events, broker, "Читает", "")
+  Rel_L(etl_events, ch, "Сохраняет", "")
+}
+
+
+Rel(user, movies, "Взаимодействует с", "")
+Rel(movies, api, "лайки, рецензии, закладки", "HTTP, CRUD")
+Rel(movies, api_events, "отслеживает и отправляет событие в", "HTTP")
+Rel(analyst, ch, "читает", "")
+
+@enduml
+
