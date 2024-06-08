@@ -10,6 +10,12 @@ class GradeFilmCreate(BaseModel):
     timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 
+class GradeFilmView(BaseModel):
+    film_id: str
+    rating_count: int
+    rating_avg: float
+
+
 class GradeReviewCreate(BaseModel):
     user_id: str
     review_id: str

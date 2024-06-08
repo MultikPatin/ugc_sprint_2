@@ -4,7 +4,7 @@ Content-Type: application/json
 Cookie: access_token={{valid_access_token}}
 
 {
-  "rating": 10
+  "rating": 5
 }
 
 > {%

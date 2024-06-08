@@ -5,6 +5,8 @@ from bunnet import Document
 from fast_depends import Depends, inject
 from pymongo import MongoClient
 
+from src.models.grades import GradeFilmView
+
 from .collections import Favorite, FilmGrade, Review, ReviewGrade
 from .mongo import get_mongo_client
 
@@ -19,6 +21,9 @@ class BaseRepository:
         if document is None:
             return None
         return document.run()
+
+    def exist(self, condition: dict[str, Any]) -> bool:
+        return self.collection.find(condition).exists()
 
     def find_one(self, condition: dict[str, Any]) -> Document | None:
         return self.collection.find_one(condition).run()
@@ -54,7 +59,14 @@ class BaseRepository:
 
 
 class GradeRepository(BaseRepository):
-    pass
+    def get_rating_film(self, film_id: str) -> GradeFilmView:
+        grades_count = self.collection.find(self.collection.film_id == film_id).count()
+        rating_avg = self.collection.find(self.collection.film_id == film_id).avg(self.collection.rating)
+
+        view_rating = GradeFilmView.model_validate(
+            {"film_id": film_id, "rating_count": grades_count, "rating_avg": rating_avg}
+        )
+        return view_rating
 
 
 class FavoriteRepository(BaseRepository):

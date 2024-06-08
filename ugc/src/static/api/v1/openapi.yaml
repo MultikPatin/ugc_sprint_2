@@ -44,7 +44,7 @@ paths:
     get:
       tags:
         - grades
-      summary: Получение списка оценок к фильмам пользователя
+      summary: Просмотр списка оценок к фильмам пользователя
       responses:
         '200':
           description: Successful operation
@@ -93,7 +93,7 @@ paths:
     get:
       tags:
         - grades
-      summary: Получение оценки к фильму
+      summary: Просмотр оценки к фильму.
       parameters:
         - in: path
           name: film_id
@@ -107,13 +107,15 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GradeFilm'
+                $ref: '#/components/schemas/GradeFilmView'
+
         '400':
           description: Invalid request, missing required parameters
         '403':
           description: Forbidden
         '404':
           description: Not found
+      security: []
 
     patch:
       tags:
@@ -526,6 +528,21 @@ components:
         timestamp:
           type: string
           example: Thu, 06 Jun 2024 23:36:32 GMT
+
+    GradeFilmView:
+      type: object
+      properties:
+        film_id:
+          type: string
+          example: cf083ea9-aa9f-4dd0-b8ee-29393c1a0a31
+        rating_avg:
+          type: integer
+          format: int32
+          example: 7.8
+        rating_count:
+          type: integer
+          format: int32
+          example: 45
 
     GradeReview:
       type: object
