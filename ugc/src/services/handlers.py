@@ -1,6 +1,6 @@
 from src.brokers.base import BaseBrokerProducer
 from src.brokers.kafka import get_kafka_producer
-from src.models.events import EventModel
+from src.models.events import EM
 
 
 class EventHandler:
@@ -9,7 +9,7 @@ class EventHandler:
     def __init__(self, producer: BaseBrokerProducer):
         self.producer = producer
 
-    def send_message(self, topic: str, key: str, data: EventModel) -> None:
+    def send_message(self, topic: str, key: str, data: EM) -> None:
         """Sending message to broker producer."""
         self.producer.produce(
             topic=topic,

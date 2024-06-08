@@ -1,5 +1,4 @@
 services:
-
   ugc:
     container_name: movies-ugc
     image: movies-ugc:latest
@@ -11,6 +10,7 @@ services:
       - SENTRY_DSN=${SENTRY_DSN}
       - LOGSTASH_HOST=logstash
       - LOGSTASH_PORT=5044
+      - MONGO_DB_URI=mongodb://mongodb:27017
     build:
       context: ./
       dockerfile: Dockerfile
@@ -19,6 +19,8 @@ services:
     depends_on:
       kafka-0:
         condition: service_healthy
+      mongodb:
+        condition: service_started
     networks:
       - kafka_network
 
@@ -97,10 +99,21 @@ services:
     networks:
       - kafka_network
 
+  mongodb:
+    image: mongo:4.4.29
+    ports:
+      - "27017:27017"
+    restart: unless-stopped
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - kafka_network
+
 volumes:
   kafka_0_data:
   kafka_1_data:
   kafka_2_data:
+  mongodb_data:
 
 networks:
   kafka_network:

@@ -2,7 +2,7 @@ from kafka import KafkaProducer
 
 from src.brokers.base import BaseBrokerProducer
 from src.core.config import settings
-from src.models.events import EventModel
+from src.models.events import EM
 
 
 class KafkaBrokerProducer(BaseBrokerProducer):
@@ -11,7 +11,7 @@ class KafkaBrokerProducer(BaseBrokerProducer):
     def __init__(self, producer: KafkaProducer):
         self.producer = producer
 
-    def produce(self, topic: str, key: str, context: EventModel) -> None:
+    def produce(self, topic: str, key: str, context: EM) -> None:
         """Sending message to kafka topic"""
         self.producer.send(
             topic=topic,

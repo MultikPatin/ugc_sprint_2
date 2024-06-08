@@ -7,12 +7,19 @@ servers:
   - url: '/api/v1'
 tags:
   - name: events
-    description: "Event data for analysis users actions"
+    description: "Пользовательские события"
+  - name: grades
+    description: "Оценка пользователей к фильму"
+  - name: favorites
+    description: "Закладки пользователей, избранные фильмы"
+  - name: reviews
+    description: "Рецензии пользователей к фильму"
 paths:
   /events:
     post:
       tags:
         - events
+      summary: Create a new user event
       parameters:
         - in: query
           name: key
@@ -20,7 +27,6 @@ paths:
             type: string
             default: test_event
       requestBody:
-        description: Create a new user event
         content:
           application/json:
             schema:
@@ -31,6 +37,445 @@ paths:
           description: Successful operation
         '400':
           description: Invalid request, missing required parameters
+        '403':
+          description: Forbidden
+
+  /grades:
+    get:
+      tags:
+        - grades
+      summary: Просмотр списка оценок к фильмам пользователя
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GradeFilm'
+        '400':
+          description: Invalid request, missing required parameters
+        '403':
+          description: Forbidden
+
+  /grades/{film_id}:
+    post:
+      tags:
+        - grades
+      summary: Добавление оценки к фильму
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GradeCreate'
+      parameters:
+        - in: path
+          name: film_id
+          schema:
+            type: string
+            example: cf083ea9-aa9f-4dd0-b8ee-29393c1a0a31
+            default: cf083ea9-aa9f-4dd0-b8ee-29393c1a0a31
+      responses:
+        '201':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GradeFilm'
+        '400':
+          description: Invalid request, missing required parameters
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+
+    get:
+      tags:
+        - grades
+      summary: Просмотр оценки к фильму.
+      parameters:
+        - in: path
+          name: film_id
+          schema:
+            type: string
+            example: cf083ea9-aa9f-4dd0-b8ee-29393c1a0a31
+            default: cf083ea9-aa9f-4dd0-b8ee-29393c1a0a31
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GradeFilmView'
+
+        '400':
+          description: Invalid request, missing required parameters
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+      security: []
+
+    patch:
+      tags:
+        - grades
+      summary: Обновление оценки к фильму
+      parameters:
+        - in: path
+          name: film_id
+          schema:
+            type: string
+            example: cf083ea9-aa9f-4dd0-b8ee-29393c1a0a31
+            default: cf083ea9-aa9f-4dd0-b8ee-29393c1a0a31
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GradeCreate'
+
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GradeFilm'
+        '400':
+          description: Invalid request, missing required parameters
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+
+    delete:
+      tags:
+        - grades
+      summary: Удаление оценки к фильму
+      parameters:
+        - in: path
+          name: film_id
+          schema:
+            type: string
+            example: cf083ea9-aa9f-4dd0-b8ee-29393c1a0a31
+            default: cf083ea9-aa9f-4dd0-b8ee-29393c1a0a31
+      responses:
+        '204':
+          description: Successful operation
+        '400':
+          description: Invalid request, missing required parameters
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+
+  /favorites:
+    get:
+      tags:
+        - favorites
+      summary: Получение списка фильмов в избранном пользователя
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Favorite'
+        '400':
+          description: Invalid request, missing required parameters
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+
+  /favorites/{film_id}:
+    post:
+      tags:
+        - favorites
+      summary: Добавление фильма в избранное
+      parameters:
+        - in: path
+          name: film_id
+          schema:
+            type: string
+            example: cf083ea9-aa9f-4dd0-b8ee-29393c1a0a31
+            default: cf083ea9-aa9f-4dd0-b8ee-29393c1a0a31
+      responses:
+        '201':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Favorite'
+        '400':
+          description: Invalid request, missing required parameters
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+
+    get:
+      tags:
+        - favorites
+      summary: Получение фильма в избранном пользователя
+      parameters:
+        - in: path
+          name: film_id
+          schema:
+            type: string
+            example: cf083ea9-aa9f-4dd0-b8ee-29393c1a0a31
+            default: cf083ea9-aa9f-4dd0-b8ee-29393c1a0a31
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Favorite'
+        '400':
+          description: Invalid request, missing required parameters
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+
+    delete:
+      tags:
+        - favorites
+      summary: Удаление фильма из избранного пользователем
+      parameters:
+        - in: path
+          name: film_id
+          schema:
+            type: string
+            example: cf083ea9-aa9f-4dd0-b8ee-29393c1a0a31
+            default: cf083ea9-aa9f-4dd0-b8ee-29393c1a0a31
+      responses:
+        '204':
+          description: Successful operation
+        '400':
+          description: Invalid request, missing required parameters
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+
+  /reviews:
+    get:
+      tags:
+        - reviews
+      summary: Получение списка рецензий к фильмам пользователя
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Review'
+        '400':
+          description: Invalid request, missing required parameters
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+
+  /reviews/{film_id}:
+    post:
+      tags:
+        - reviews
+      summary: Добавление рецензии на фильм
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReviewCreate'
+      parameters:
+        - in: path
+          name: film_id
+          schema:
+            type: string
+            example: cf083ea9-aa9f-4dd0-b8ee-29393c1a0a31
+            default: cf083ea9-aa9f-4dd0-b8ee-29393c1a0a31
+      responses:
+        '201':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Review'
+        '400':
+          description: Invalid request, missing required parameters
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+
+    get:
+      tags:
+        - reviews
+      summary: просмотр списка рецензий к фильму.
+      parameters:
+        - in: path
+          name: film_id
+          schema:
+            type: string
+            example: cf083ea9-aa9f-4dd0-b8ee-29393c1a0a31
+            default: cf083ea9-aa9f-4dd0-b8ee-29393c1a0a31
+      responses:
+        '201':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Review'
+        '400':
+          description: Invalid request, missing required parameters
+        '404':
+          description: Not found
+      security: []
+
+    patch:
+      tags:
+        - reviews
+      summary: Изменение рецензии к фильму
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReviewCreate'
+      parameters:
+        - in: path
+          name: film_id
+          schema:
+            type: string
+            example: cf083ea9-aa9f-4dd0-b8ee-29393c1a0a31
+            default: cf083ea9-aa9f-4dd0-b8ee-29393c1a0a31
+      responses:
+        '201':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Review'
+        '400':
+          description: Invalid request, missing required parameters
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+
+    delete:
+      tags:
+        - reviews
+      summary: Удаление рецензии к фильму
+      parameters:
+        - in: path
+          name: film_id
+          schema:
+            type: string
+            example: cf083ea9-aa9f-4dd0-b8ee-29393c1a0a31
+            default: cf083ea9-aa9f-4dd0-b8ee-29393c1a0a31
+      responses:
+        '204':
+          description: Successful operation
+        '400':
+          description: Invalid request, missing required parameters
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+
+  /reviews/{id}/grade:
+    post:
+      tags:
+        - review grade
+      summary: Добавление оценки к рецензии
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GradeCreate'
+      parameters:
+        - in: path
+          name: id
+          description: review id
+          schema:
+            type: string
+            example: cf083ea9-aa9f-4dd0-b8ee-29393c1a0a31
+            default: cf083ea9-aa9f-4dd0-b8ee-29393c1a0a31
+      responses:
+        '201':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GradeReview'
+        '400':
+          description: Invalid request, missing required parameters
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+
+    patch:
+      tags:
+        - review grade
+      summary: Обновление оценки к рецензии
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GradeCreate'
+      parameters:
+        - in: path
+          name: id
+          description: review id
+          schema:
+            type: string
+            example: cf083ea9-aa9f-4dd0-b8ee-29393c1a0a31
+            default: cf083ea9-aa9f-4dd0-b8ee-29393c1a0a31
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GradeReview'
+        '400':
+          description: Invalid request, missing required parameters
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+
+    delete:
+      tags:
+        - review grade
+      summary: Удаление оценки к рецензии
+      parameters:
+        - in: path
+          name: id
+          description: review id
+          schema:
+            type: string
+            example: cf083ea9-aa9f-4dd0-b8ee-29393c1a0a31
+            default: cf083ea9-aa9f-4dd0-b8ee-29393c1a0a31
+      responses:
+        '200':
+          description: Successful operation
+        '400':
+          description: Invalid request, missing required parameters
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+
 
 components:
   securitySchemes:
@@ -63,6 +508,118 @@ components:
         action:
           type: string
           example: Начало просмотра
+
+    GradeFilm:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 66624800d89be65ed7202397
+        film_id:
+          type: string
+          example: cf083ea9-aa9f-4dd0-b8ee-29393c1a0a31
+        rating:
+          type: integer
+          format: int32
+          example: 10
+        user_id:
+          type: string
+          example: bf051197-081c-42ae-9ef3-566f49d58a73
+        timestamp:
+          type: string
+          example: Thu, 06 Jun 2024 23:36:32 GMT
+
+    GradeFilmView:
+      type: object
+      properties:
+        film_id:
+          type: string
+          example: cf083ea9-aa9f-4dd0-b8ee-29393c1a0a31
+        rating_avg:
+          type: integer
+          format: int32
+          example: 7.8
+        rating_count:
+          type: integer
+          format: int32
+          example: 45
+
+    GradeReview:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 66624800d89be65ed7202397
+        review_id:
+          type: string
+          example: 5f0d0f67-ec20-4d88-96cc-3c7fff39e8e7
+        rating:
+          type: integer
+          format: int32
+          example: 10
+        user_id:
+          type: string
+          example: bf051197-081c-42ae-9ef3-566f49d58a73
+        timestamp:
+          type: string
+          example: Thu, 06 Jun 2024 23:36:32 GMT
+
+    GradeCreate:
+      required:
+        - rating
+      type: object
+      properties:
+        rating:
+          type: integer
+          format: int32
+          example: 10
+
+    Favorite:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 66624800d89be65ed7202397
+        film_id:
+          type: string
+          example: cf083ea9-aa9f-4dd0-b8ee-29393c1a0a31
+        user_id:
+          type: string
+          example: bf051197-081c-42ae-9ef3-566f49d58a73
+        timestamp:
+          type: string
+          example: Thu, 06 Jun 2024 23:36:32 GMT
+
+    Review:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 666361e25b1b01d7066d8134
+        film_id:
+          type: string
+          example: cf083ea9-aa9f-4dd0-b8ee-29393c1a0a31
+        author:
+          type: string
+          example: bf051197-081c-42ae-9ef3-566f49d58a73
+        text:
+          type: string
+          example: Рецензия к фильму.
+        rating:
+          type: integer
+          example: 5
+        timestamp:
+          type: string
+          example: Fri, 07 Jun 2024 16:58:50 GMT
+
+    ReviewCreate:
+      type: object
+      required:
+        - text
+      properties:
+        text:
+          type: string
+          example: Рецензия к фильму.
 
 security:
   - cookieAuth: []

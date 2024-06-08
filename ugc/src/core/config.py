@@ -20,12 +20,12 @@ class AppSettings(EnvSettings):
 
 
 class SentrySettings(EnvSettings):
-    dsn: str = Field(..., alias="SENTRY_DSN")
+    sentry_dsn: str = Field(default="https://exemple")
 
 
 class LogstashSettings(EnvSettings):
-    host: str = Field(..., alias="LOGSTASH_HOST")
-    port: int = Field(..., alias="LOGSTASH_PORT")
+    logstash_host: str = Field(default="logstash")
+    logstash_port: int = Field(default=5044)
 
 
 class SwaggerSettings(EnvSettings):
@@ -45,12 +45,18 @@ class KafkaSettings(EnvSettings):
         return f"{self.kafka_host}:{self.kafka_port}"
 
 
+class MongoDBSettings(EnvSettings):
+    mongo_db_uri: str = Field(default="mongodb://localhost:27017")
+    mongo_db_name: str = Field(default="ugc")
+
+
 class Settings(BaseSettings):
     app: AppSettings = AppSettings()
     sentry: SentrySettings = SentrySettings()
     logstash: LogstashSettings = LogstashSettings()
     swagger: SwaggerSettings = SwaggerSettings()
     kafka: KafkaSettings = KafkaSettings()
+    mongodb: MongoDBSettings = MongoDBSettings()
 
 
 settings = Settings()
