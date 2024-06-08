@@ -33,18 +33,28 @@ class BaseRepository:
         return document.create()
 
     @staticmethod
-    def delete(document: Document) -> None:
-        document.delete()
-
-
-class GradeRepository(BaseRepository):
-    @staticmethod
-    def update(grade: FilmGrade, rating: int) -> FilmGrade:
+    def update_rating(grade: Document, rating: int) -> Document:
         grade.rating = rating
         grade.timestamp = datetime.now(timezone.utc)
         grade.save_changes()
 
         return grade
+
+    @staticmethod
+    def update_text(document: Document, text: str) -> Document:
+        document.text = text
+        document.timestamp = datetime.now(timezone.utc)
+        document.save_changes()
+
+        return document
+
+    @staticmethod
+    def delete(document: Document) -> None:
+        document.delete()
+
+
+class GradeRepository(BaseRepository):
+    pass
 
 
 class FavoriteRepository(BaseRepository):
@@ -52,23 +62,11 @@ class FavoriteRepository(BaseRepository):
 
 
 class ReviewRepository(BaseRepository):
-    @staticmethod
-    def update(review: Review, text: str) -> Review:
-        review.text = text
-        review.timestamp = datetime.now(timezone.utc)
-        review.save_changes()
-
-        return review
+    pass
 
 
 class ReviewGradeRepository(BaseRepository):
-    @staticmethod
-    def update(grade: ReviewGrade, rating: int) -> ReviewGrade:
-        grade.rating = rating
-        grade.timestamp = datetime.now(timezone.utc)
-        grade.save_changes()
-
-        return grade
+    pass
 
 
 @inject

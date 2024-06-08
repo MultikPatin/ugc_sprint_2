@@ -71,7 +71,7 @@ def update(user: AuthUser, film_id: UUID, repository: Annotated[GradeRepository,
         if grade_exist is None:
             abort(HTTPStatus.NOT_FOUND, description="Film not found")
 
-        grade = repository.update(grade_exist, data_model.rating)
+        grade = repository.update_rating(grade_exist, data_model.rating)
 
         return jsonify(grade.model_dump()), HTTPStatus.OK
 
