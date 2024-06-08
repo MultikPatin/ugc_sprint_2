@@ -1,3 +1,7 @@
+Адрес репозитория:
+
+https://github.com/MultikPatin/ugc_sprint_2
+
 # Проектная работа 9 спринта
 
 ### Check status for main
